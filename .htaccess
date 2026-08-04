@@ -1,0 +1,11 @@
+# Désactiver la compression pour les fichiers Moodle (fix ERR_CONTENT_DECODING_FAILED)
+<IfModule mod_deflate.c>
+    SetEnvIfNoCase Request_URI \.php$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI styles\.php no-gzip dont-vary
+    SetEnvIfNoCase Request_URI javascript\.php no-gzip dont-vary
+    SetEnvIfNoCase Request_URI yui_combo\.php no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header unset Content-Encoding
+</IfModule>

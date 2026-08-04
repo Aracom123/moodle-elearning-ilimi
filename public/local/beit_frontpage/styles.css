@@ -1,0 +1,527 @@
+/**
+ * BEIT Frontpage — styles du catalogue de cours.
+ *
+ * @package   local_beit_frontpage
+ * @copyright 2026 BEIT
+ */
+
+.beit-catalog {
+    --beit-primary: #2563eb;
+    --beit-primary-dark: #1e40af;
+    --beit-text: #0f172a;
+    --beit-muted: #64748b;
+    --beit-bg-card: #ffffff;
+    --beit-border: #e2e8f0;
+    --beit-radius: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem;
+    color: var(--beit-text);
+}
+
+/* Variante pleine largeur : occupe l'écran avec une marge normale. */
+.beit-catalog--full {
+    max-width: none;
+    margin: 0;
+    padding: 0 2.5rem 3rem;
+}
+
+/* ---------- Hero ---------- */
+.beit-catalog-hero {
+    text-align: center;
+    padding: 3.5rem 1rem 2.5rem;
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+    border-radius: var(--beit-radius);
+    margin-bottom: 2.5rem;
+}
+
+.beit-catalog-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--beit-text);
+}
+
+.beit-catalog-subtitle {
+    font-size: 1.1rem;
+    color: var(--beit-muted);
+    max-width: 640px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+}
+
+.beit-catalog-cta {
+    display: inline-block;
+    background: var(--beit-primary);
+    color: #fff;
+    padding: 0.85rem 1.75rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.beit-catalog-cta:hover {
+    background: var(--beit-primary-dark);
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* ---------- Layout filtres + résultats ---------- */
+.beit-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Colonne de filtres */
+.beit-filters {
+    position: sticky;
+    top: 1rem;
+    background: var(--beit-bg-card);
+    border: 1px solid var(--beit-border);
+    border-radius: var(--beit-radius);
+    padding: 1.5rem;
+}
+
+.beit-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.beit-filters-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.beit-filters-reset {
+    background: none;
+    border: none;
+    color: var(--beit-primary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.beit-filters-reset:hover {
+    text-decoration: underline;
+}
+
+.beit-filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.beit-filter-group:last-child {
+    margin-bottom: 0;
+}
+
+.beit-filter-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--beit-muted);
+    margin-bottom: 0.6rem;
+}
+
+.beit-filter-search,
+.beit-filter-select {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--beit-border);
+    border-radius: 10px;
+    font-size: 0.92rem;
+    color: var(--beit-text);
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.beit-filter-search:focus,
+.beit-filter-select:focus {
+    outline: none;
+    border-color: var(--beit-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.beit-filter-cats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.beit-filter-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+    color: var(--beit-text);
+    cursor: pointer;
+}
+
+.beit-filter-check input {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--beit-primary);
+}
+
+.beit-cat-count {
+    color: var(--beit-muted);
+    font-size: 0.82rem;
+}
+
+/* Colonne résultats */
+.beit-results {
+    min-width: 0;
+}
+
+.beit-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.beit-results-count {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--beit-muted);
+}
+
+.beit-filters-toggle {
+    display: none;
+    background: var(--beit-primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 1.1rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.beit-no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--beit-muted);
+    font-size: 1.05rem;
+}
+
+/* ---------- Grille (3 colonnes sur grand écran) ---------- */
+.beit-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* Écrans très larges : on peut passer à 4 colonnes. */
+@media (min-width: 1600px) {
+    .beit-courses-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Écrans moyens : 2 colonnes. */
+@media (max-width: 1100px) {
+    .beit-courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.beit-course-card {
+    background: var(--beit-bg-card);
+    border: 1px solid var(--beit-border);
+    border-radius: var(--beit-radius);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+}
+
+.beit-course-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+}
+
+.beit-course-card-link {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.beit-course-card-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.beit-course-img {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.beit-course-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.beit-course-card:hover .beit-course-img img {
+    transform: scale(1.05);
+}
+
+.beit-course-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: var(--beit-primary);
+    font-size: 2.5rem;
+}
+
+.beit-course-body {
+    padding: 1.25rem 1.25rem 0.5rem;
+    flex: 1;
+}
+
+.beit-course-shortname {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--beit-primary);
+    background: #eff6ff;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 0.6rem;
+}
+
+.beit-course-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin: 0 0 0.5rem;
+    color: var(--beit-text);
+}
+
+.beit-course-summary {
+    font-size: 0.9rem;
+    color: var(--beit-muted);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.beit-course-footer {
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.beit-course-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--beit-primary);
+}
+
+.beit-course-btn::after {
+    content: "→";
+    transition: transform 0.2s ease;
+}
+
+.beit-course-card:hover .beit-course-btn::after {
+    transform: translateX(4px);
+}
+
+.beit-course-btn--guest {
+    color: var(--beit-muted);
+}
+
+/* ---------- État vide ---------- */
+.beit-catalog-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--beit-muted);
+    font-size: 1.05rem;
+}
+
+/* ---------- Page d'aperçu ---------- */
+.beit-preview {
+    --beit-primary: #2563eb;
+    --beit-primary-dark: #1e40af;
+    --beit-text: #0f172a;
+    --beit-muted: #64748b;
+    --beit-border: #e2e8f0;
+    --beit-radius: 16px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    color: var(--beit-text);
+}
+
+.beit-preview-back {
+    display: inline-block;
+    margin-bottom: 1.25rem;
+    color: var(--beit-muted);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.beit-preview-back:hover {
+    color: var(--beit-primary);
+    text-decoration: none;
+}
+
+.beit-preview-card {
+    background: #fff;
+    border: 1px solid var(--beit-border);
+    border-radius: var(--beit-radius);
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+.beit-preview-media {
+    aspect-ratio: 21 / 9;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.beit-preview-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.beit-preview-media-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: var(--beit-primary);
+    font-size: 4rem;
+}
+
+.beit-preview-content {
+    padding: 2rem;
+}
+
+.beit-preview-shortname {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--beit-primary);
+    background: #eff6ff;
+    padding: 0.25rem 0.7rem;
+    border-radius: 6px;
+    margin-bottom: 0.85rem;
+}
+
+.beit-preview-title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.02em;
+}
+
+.beit-preview-teachers {
+    color: var(--beit-muted);
+    font-size: 0.95rem;
+    margin: 0 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.beit-preview-summary {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #334155;
+    margin-bottom: 2rem;
+}
+
+.beit-preview-summary--empty {
+    color: var(--beit-muted);
+    font-style: italic;
+}
+
+.beit-preview-cta-box {
+    border-top: 1px solid var(--beit-border);
+    padding-top: 1.75rem;
+    text-align: center;
+}
+
+.beit-preview-cta-text {
+    color: var(--beit-muted);
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+}
+
+/* ---------- Pleine largeur : neutraliser la contrainte du thème ---------- */
+/* Sur la page d'accueil (#page-site-index), le thème limite .main-inner à
+   ~830px via .limitedwidth. On élargit uniquement cette page. */
+#page-site-index .main-inner,
+#page-site-index #region-main,
+#page-site-index #region-main-box,
+#page-site-index #page-content {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* ---------- Responsive ---------- */
+/* Tablette/mobile : filtres en pleine largeur, repliables via bouton. */
+@media (max-width: 900px) {
+    .beit-catalog--full {
+        padding: 0 1.25rem 3rem;
+    }
+    .beit-layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .beit-filters {
+        position: static;
+        display: none;
+    }
+    .beit-filters.beit-filters--open {
+        display: block;
+    }
+    .beit-filters-toggle {
+        display: inline-block;
+    }
+}
+
+@media (max-width: 600px) {
+    .beit-catalog-hero {
+        padding: 2.5rem 1rem 2rem;
+    }
+    .beit-courses-grid {
+        grid-template-columns: 1fr;
+    }
+    .beit-preview-content {
+        padding: 1.5rem;
+    }
+}

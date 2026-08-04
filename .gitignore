@@ -1,0 +1,26 @@
+# --- Config locale (contient les identifiants BDD) ---
+config.php
+
+# --- Archive d'installation Moodle (trop volumineuse pour GitHub) ---
+moodle-latest-502.zip
+
+# --- Documents personnels / business (contrats, factures, proforma) ---
+*.docx
+*.xlsx
+*.pptx
+
+# --- Données Moodle générées localement ---
+/moodledata/
+*.log
+
+# --- Dépendances (à réinstaller via composer/npm) ---
+/node_modules/
+/vendor/
+
+# --- Fichiers système ---
+.DS_Store
+Thumbs.db
+
+**/.github/workflows/ci.yml
+
+public/blocks/completion_progress/
