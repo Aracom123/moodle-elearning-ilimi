@@ -1,0 +1,72 @@
+x-moodle-environment: &moodle-environment
+  MOODLE_WWWROOT: http://localhost:8080
+  MOODLE_DB_TYPE: mysqli
+  MOODLE_DB_HOST: db
+  MOODLE_DB_NAME: elearning_db
+  MOODLE_DB_USER: moodle
+  MOODLE_DB_PASSWORD: moodle
+  MOODLE_DB_PREFIX: el_
+  MOODLE_ADMIN_USER: admin
+  MOODLE_ADMIN_PASSWORD: Admin123!
+  MOODLE_ADMIN_EMAIL: admin@example.test
+  MOODLE_SITE_NAME: ILIMI E-learning
+  MOODLE_SITE_SHORTNAME: ILIMI
+
+services:
+  db:
+    image: mysql:8.4
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    environment:
+      MYSQL_DATABASE: elearning_db
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: moodle
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --host=localhost --user=root --password=root --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      <<: *moodle-environment
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/ > /dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www/moodle
+      - composer_vendor:/var/www/moodle/vendor
+      - moodle_data:/var/www/moodledata
+    restart: unless-stopped
+
+  cron:
+    build:
+      context: .
+    depends_on:
+      web:
+        condition: service_healthy
+    command: ["sh", "-c", "while true; do php admin/cli/cron.php --keep-alive=0; sleep 60; done"]
+    environment:
+      <<: *moodle-environment
+    volumes:
+      - .:/var/www/moodle
+      - composer_vendor:/var/www/moodle/vendor
+      - moodle_data:/var/www/moodledata
+    restart: unless-stopped
+
+volumes:
+  composer_vendor:
+  moodle_data:
+  mysql_data:

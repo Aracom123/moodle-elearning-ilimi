@@ -93,7 +93,41 @@
                     </div>
                 {{/hasblocks}}
             </div>
-            {{{ output.full_header }}}
+            {{#isfrontpage}}
+            <section class="isp-home-hero" aria-labelledby="isp-home-title">
+                <div class="isp-home-copy">
+                    <p class="isp-home-eyebrow"><span aria-hidden="true"></span> Institut de Santé Publique</p>
+                    <h1 id="isp-home-title">Apprendre pour mieux agir en santé publique.</h1>
+                    <p class="isp-home-lead">Des formations ancrées dans les réalités du terrain pour observer, comprendre et transformer la santé des communautés.</p>
+                    <div class="isp-home-actions">
+                        <a class="btn isp-btn-primary" href="{{primaryactionurl}}">{{primaryactionlabel}} <span aria-hidden="true">→</span></a>
+                        <a class="isp-link-action" href="{{catalogurl}}">Explorer les formations</a>
+                    </div>
+                    <ul class="isp-home-facts" aria-label="Services disponibles">
+                        <li><strong>{{coursecount}}</strong> formations</li>
+                        <li>Progression suivie</li>
+                        <li>Badges & certificats</li>
+                    </ul>
+                </div>
+                <div class="isp-field-map" aria-label="Parcours pédagogique : observer, comprendre, agir">
+                    <div class="isp-map-grid" aria-hidden="true"></div>
+                    <p class="isp-map-label">PARCOURS DE TERRAIN · ISP</p>
+                    <div class="isp-map-path" aria-hidden="true">
+                        <svg viewBox="0 0 520 270" role="img">
+                            <path class="isp-map-line" d="M56 205 C145 205 145 72 254 72 S370 205 468 205" />
+                            <circle cx="56" cy="205" r="9" />
+                            <circle cx="254" cy="72" r="9" />
+                            <circle cx="468" cy="205" r="9" />
+                        </svg>
+                    </div>
+                    <div class="isp-map-step isp-map-step--one"><span>01</span><strong>Observer</strong><small>les données</small></div>
+                    <div class="isp-map-step isp-map-step--two"><span>02</span><strong>Comprendre</strong><small>les déterminants</small></div>
+                    <div class="isp-map-step isp-map-step--three"><span>03</span><strong>Agir</strong><small>avec les communautés</small></div>
+                    <a class="isp-announcement-link" href="{{announcementsurl}}"><span aria-hidden="true">●</span> Voir les dernières annonces</a>
+                </div>
+            </section>
+            {{/isfrontpage}}
+            {{^isfrontpage}}{{{ output.full_header }}}{{/isfrontpage}}
             {{#secondarymoremenu}}
                 <div class="secondary-navigation d-print-none">
                     {{> core/moremenu}}
@@ -141,8 +175,8 @@
             <div class="beit-footer-col">
                 <p class="beit-footer-heading">Liens utiles</p>
                 <ul class="beit-footer-links">
-                    <li><a href="/public/">Accueil</a></li>
-                    <li><a href="/public/login/forgot_password.php">Mot de passe oublié</a></li>
+                    <li><a href="{{homeurl}}">Accueil</a></li>
+                    <li><a href="{{forgotpasswordurl}}">Mot de passe oublié</a></li>
                     <li><a href="https://beit.ne" target="_blank" rel="noopener">Site BEIT</a></li>
                 </ul>
             </div>

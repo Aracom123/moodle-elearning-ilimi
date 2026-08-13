@@ -53,6 +53,8 @@ $PAGE->set_other_editing_capability('moodle/course:activityvisibility');
 // Prevent caching of this page to stop confusion when changing page after making AJAX changes.
 $PAGE->set_cacheable(false);
 
+require_course_login($SITE);
+
 $hasmaintenanceaccess = has_capability('moodle/site:maintenanceaccess', context_system::instance());
 
 // If the site is currently under maintenance, then print a message.

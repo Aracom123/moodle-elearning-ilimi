@@ -1,0 +1,17 @@
+{
+  "name": "udir-moodle/block_completion_progress",
+  "description": "Completion Progress — Composer/Packagist mirror of the Moodle plugin block_completion_progress, auto-updated from the Moodle plugins directory.",
+  "type": "moodle-block",
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://moodle.org/plugins/block_completion_progress",
+  "require": {
+    "composer/installers": "~1.0 || ~2.0",
+    "moodle/moodle": "4.5.* || 5.0.* || 5.1.* || 5.2.*"
+  },
+  "extra": {
+    "installer-name": "completion_progress",
+    "moodle-composer": {
+      "component": "block_completion_progress"
+    }
+  }
+}

@@ -1,13 +1,13 @@
 # --- Config locale (contient les identifiants BDD) ---
-config.php
+/config.php
 
 # --- Archive d'installation Moodle (trop volumineuse pour GitHub) ---
-moodle-latest-502.zip
+/moodle-latest-502.zip
 
 # --- Documents personnels / business (contrats, factures, proforma) ---
-*.docx
-*.xlsx
-*.pptx
+/*.docx
+/*.xlsx
+/*.pptx
 
 # --- Données Moodle générées localement ---
 /moodledata/
@@ -22,5 +22,3 @@ moodle-latest-502.zip
 Thumbs.db
 
 **/.github/workflows/ci.yml
-
-public/blocks/completion_progress/

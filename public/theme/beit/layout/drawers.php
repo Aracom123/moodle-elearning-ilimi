@@ -10,6 +10,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $DB;
+
 require_once($CFG->libdir . '/behat/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 
@@ -78,6 +80,13 @@ $coursefullname = ($PAGE->course?->fullname) ? format_string(
     ['context' => context_course::instance($PAGE->course->id), 'escape' => false],
 ) : '';
 $courseurl = $PAGE->course ? new \core\url('/course/view.php', ['id' => $PAGE->course->id]) : null;
+$isfrontpage = $PAGE->pagetype === 'site-index';
+$islearnerloggedin = isloggedin() && !isguestuser();
+$primaryactionurl = $islearnerloggedin
+    ? new moodle_url('/my/courses.php')
+    : new moodle_url('/login/index.php');
+$primaryactionlabel = $islearnerloggedin ? 'Continuer mes cours' : 'Se connecter';
+$coursecount = $isfrontpage ? $DB->count_records_select('course', 'id <> :siteid AND visible = 1', ['siteid' => SITEID]) : 0;
 
 $templatecontext = [
     'sitename'               => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), 'escape' => false]),
@@ -101,6 +110,15 @@ $templatecontext = [
     'overflow'               => $overflow,
     'headercontent'          => $headercontent,
     'addblockbutton'         => $addblockbutton,
+    'isfrontpage'           => $isfrontpage,
+    'learnerloggedin'       => $islearnerloggedin,
+    'primaryactionurl'      => $primaryactionurl->out(false),
+    'primaryactionlabel'    => $primaryactionlabel,
+    'catalogurl'            => (new moodle_url('/course/'))->out(false),
+    'homeurl'               => (new moodle_url('/'))->out(false),
+    'forgotpasswordurl'     => (new moodle_url('/login/forgot_password.php'))->out(false),
+    'announcementsurl'      => (new moodle_url('/mod/forum/view.php', ['f' => forum_get_course_forum(SITEID, 'news')->id]))->out(false),
+    'coursecount'           => $coursecount,
 ];
 
 echo $OUTPUT->render_from_template('theme_beit/drawers', $templatecontext);

@@ -734,5 +734,177 @@ body.path-login h1.login-heading {
 }
 ';
 
+    // ── Accueil ISP : une carte de terrain pédagogique ─────────────────
+    $scss .= '
+body.pagelayout-frontpage { background: #f4f7f6; }
+.navbar-brand .logo { display: none !important; }
+.navbar-brand::after {
+    content: "ISP eLearning";
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+body.pagelayout-frontpage #page.drawers .main-inner {
+    max-width: 1440px;
+    padding-left: clamp(1rem, 4vw, 4rem);
+    padding-right: clamp(1rem, 4vw, 4rem);
+}
+.isp-home-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    align-items: center;
+    min-height: 590px;
+    margin: 1.5rem 0 4.5rem;
+    padding: clamp(2rem, 5vw, 5.5rem);
+    overflow: hidden;
+    border-radius: 2px 48px 2px 48px;
+    color: #fff;
+    background: #073b55;
+    box-shadow: 0 28px 70px rgba(4, 43, 63, .2);
+}
+.isp-home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle at 82% 16%, rgba(20, 184, 166, .22), transparent 30%),
+        linear-gradient(115deg, transparent 55%, rgba(255,255,255,.025) 55%);
+}
+.isp-home-copy, .isp-field-map { position: relative; z-index: 1; }
+.isp-home-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin: 0 0 1.5rem;
+    color: #a9ddd7;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+.isp-home-eyebrow span { width: 2.5rem; height: 2px; background: #f6b73f; }
+.isp-home-copy h1 {
+    max-width: 760px;
+    margin: 0;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3rem, 5.4vw, 5.8rem);
+    font-weight: 500;
+    line-height: .98;
+    letter-spacing: -.045em;
+}
+.isp-home-lead {
+    max-width: 640px;
+    margin: 2rem 0 0;
+    color: rgba(255,255,255,.74);
+    font-size: clamp(1rem, 1.35vw, 1.22rem);
+    line-height: 1.75;
+}
+.isp-home-actions { display: flex; align-items: center; gap: 1.5rem; margin-top: 2.4rem; flex-wrap: wrap; }
+.isp-btn-primary {
+    padding: .9rem 1.4rem;
+    border: 1px solid #f6b73f;
+    border-radius: 0 14px 0 14px;
+    background: #f6b73f;
+    color: #17324a !important;
+    font-weight: 750;
+    box-shadow: none;
+}
+.isp-btn-primary:hover, .isp-btn-primary:focus {
+    border-color: #ffd780;
+    background: #ffd780;
+    color: #102a43 !important;
+    transform: translateY(-2px);
+}
+.isp-link-action { color: #fff !important; font-weight: 650; text-decoration: underline; text-underline-offset: .38rem; }
+.isp-link-action:hover { color: #a9ddd7 !important; }
+.isp-home-facts {
+    display: flex;
+    gap: 1.4rem;
+    margin: 3rem 0 0;
+    padding: 1.25rem 0 0;
+    border-top: 1px solid rgba(255,255,255,.15);
+    list-style: none;
+    color: rgba(255,255,255,.66);
+    font-size: .78rem;
+    letter-spacing: .03em;
+}
+.isp-home-facts li + li { padding-left: 1.4rem; border-left: 1px solid rgba(255,255,255,.15); }
+.isp-home-facts strong { color: #fff; font-size: 1rem; }
+.isp-field-map {
+    min-height: 430px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 2px 34px 2px 34px;
+    background: rgba(4, 45, 65, .72);
+    backdrop-filter: blur(6px);
+}
+.isp-map-grid {
+    position: absolute; inset: 0; opacity: .13;
+    background-image: linear-gradient(rgba(255,255,255,.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.45) 1px, transparent 1px);
+    background-size: 34px 34px;
+}
+.isp-map-label { position: absolute; top: 1.5rem; left: 1.6rem; margin: 0; color: #a9ddd7; font-size: .68rem; letter-spacing: .14em; }
+.isp-map-path { position: absolute; inset: 60px 18px 62px; }
+.isp-map-path svg { width: 100%; height: 100%; overflow: visible; }
+.isp-map-line { fill: none; stroke: #f6b73f; stroke-width: 3; stroke-dasharray: 8 8; }
+.isp-map-path circle { fill: #f6b73f; stroke: #073b55; stroke-width: 5; }
+.isp-map-step { position: absolute; display: flex; flex-direction: column; color: #fff; }
+.isp-map-step span { color: #f6b73f; font: italic 1rem Georgia, serif; }
+.isp-map-step strong { font: 500 clamp(1.2rem, 2vw, 1.65rem) Georgia, serif; }
+.isp-map-step small { color: rgba(255,255,255,.6); }
+.isp-map-step--one { left: 5%; bottom: 24%; }
+.isp-map-step--two { left: 43%; top: 25%; }
+.isp-map-step--three { right: 4%; bottom: 24%; text-align: right; }
+.isp-announcement-link {
+    position: absolute; right: 1.6rem; bottom: 1.35rem;
+    color: #bde9e4 !important; font-size: .78rem; text-decoration: none;
+}
+.isp-announcement-link span { color: #f6b73f; margin-right: .35rem; }
+body.pagelayout-frontpage #page-content {
+    padding: clamp(1.5rem, 3vw, 3rem) !important;
+    border: 1px solid #dce7e4;
+    border-radius: 2px 30px 2px 30px;
+    background: #fff;
+    box-shadow: 0 14px 38px rgba(17, 61, 70, .07);
+}
+body.pagelayout-frontpage #page-content h2 {
+    color: #123f52;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.6rem, 2.4vw, 2.35rem);
+    font-weight: 500;
+}
+body.pagelayout-frontpage .coursebox {
+    margin: .8rem 0;
+    padding: 1rem 1.2rem;
+    border: 0;
+    border-left: 3px solid #15958a;
+    border-radius: 0 12px 12px 0;
+    background: #f6faf9;
+    transition: transform .16s ease, background .16s ease;
+}
+body.pagelayout-frontpage .coursebox:hover { transform: translateX(4px); background: #edf7f5; }
+body.pagelayout-frontpage .coursebox .coursename a { color: #123f52; font-weight: 700; }
+body.pagelayout-frontpage .forumpost { border-color: #dce7e4; box-shadow: none; }
+@media (max-width: 1050px) {
+    .isp-home-hero { grid-template-columns: 1fr; }
+    .isp-field-map { min-height: 390px; }
+}
+@media (max-width: 650px) {
+    .isp-home-hero { min-height: auto; margin-top: .75rem; padding: 2.1rem 1.3rem; border-radius: 2px 28px 2px 28px; }
+    .isp-home-copy h1 { font-size: clamp(2.65rem, 14vw, 4rem); }
+    .isp-home-facts { gap: .75rem; flex-wrap: wrap; }
+    .isp-home-facts li + li { padding-left: .75rem; }
+    .isp-field-map { min-height: 350px; }
+    .isp-map-step strong { font-size: 1.05rem; }
+    .isp-map-step small { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .isp-btn-primary, body.pagelayout-frontpage .coursebox { transition: none; }
+}
+';
+
     return $scss;
 }
