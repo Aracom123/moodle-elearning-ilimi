@@ -22,3 +22,6 @@
 Thumbs.db
 
 **/.github/workflows/ci.yml
+moodle-filedir.tgz
+.gitignore
+moodle-snapshot.sql
