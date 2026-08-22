@@ -149,6 +149,19 @@ $string['telegram'] = 'Telegram';
 $string['telegramdesc'] = 'Enter your Telegram contact or group link.';
 $string['contactus'] = 'Contact us';
 $string['followus'] = 'Follow us';
+$string['footerinstitution'] = 'Institut de Santé Publique — Niger';
+$string['footerplatform'] = 'ISP e-learning platform';
+$string['footerdescription'] = 'A dedicated learning space for building, monitoring and certifying public-health skills.';
+$string['footerinstitutionwebsite'] = 'Visit our website';
+$string['footerquicklinks'] = 'Quick links';
+$string['footerdashboard'] = 'Dashboard';
+$string['footermycourses'] = 'My courses';
+$string['footercoursecatalogue'] = 'Course catalogue';
+$string['footersupportandprivacy'] = 'Support and privacy';
+$string['footersupportcopy'] = 'Need help with the platform? Consult the available information or contact site support.';
+$string['footerallrightsreserved'] = 'All rights reserved.';
+$string['footerbuiltby'] = 'This e-learning platform for the Institut de Santé Publique — Niger was designed and developed by';
+$string['footercontentcopyright'] = 'Educational content and institutional identity © Institut de Santé Publique — Niger.';
 
 // Mypublic page.
 $string['aboutme'] = 'About me';

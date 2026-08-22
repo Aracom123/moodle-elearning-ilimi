@@ -82,7 +82,9 @@ class settings {
     public function footer() {
         global $CFG;
 
-        $templatecontext = [];
+        $templatecontext = [
+            'currentyear' => userdate(time(), '%Y'),
+        ];
 
         $settings = [
             'facebook', 'twitter', 'linkedin', 'youtube', 'instagram', 'whatsapp', 'telegram', 'tiktok', 'pinterest',

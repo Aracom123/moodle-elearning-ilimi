@@ -3,15 +3,10 @@
 }
 
 #page-footer {
-    background-color: #282829;
+    background-color: $brand-primary;
     color: #fff;
 
     a:not(.btn) {
-        color: #fff;
-    }
-
-    .contactsitesupport {
-        border: 1px solid #fff;
         color: #fff;
     }
 
@@ -23,182 +18,147 @@
         }
     }
 
-    .footer-columns {
-        padding: 15px;
+    .isp-footer-main {
+        background:
+            linear-gradient(120deg, rgba($brand-primary, .98), rgba(darken($brand-primary, 18%), .98)),
+            $brand-primary;
+        padding: 3.5rem 0 2.75rem;
     }
 
-    .logo {
-        max-width: 50%;
+    .isp-footer-kicker {
+        color: rgba(#fff, .75);
+        font-size: .8125rem;
+        font-weight: 700;
+        letter-spacing: .1em;
+        margin-bottom: .5rem;
+        text-transform: uppercase;
     }
 
-    h3.footer-title {
-        font-size: $h6-font-size;
-        line-height: 1.2;
-        font-weight: 500;
-    }
-
-    .socialnetworks,
-    .contact {
-        margin-top: .5rem;
-
-        ul {
-            padding-left: 0;
-
-            li {
-                display: inline;
-
-                a {
-                    text-decoration: none;
-                    color: #fff;
-                    width: 38px;
-                    height: 38px;
-                    padding: 0.6rem 0.75rem;
-
-                    &.btn-rounded {
-                        border-radius: 50%;
-                    }
-
-                    &.website {
-                        background-color: $brand-primary;
-                        &:hover {
-                            background-color: darken($brand-primary, 20%);
-                        }
-                    }
-
-                    &.mobile {
-                        background-color: $brand-primary;
-                        &:hover {
-                            background-color: darken($brand-primary, 20%);
-                        }
-                    }
-
-                    &.mail {
-                        background-color: $brand-primary;
-                        &:hover {
-                            background-color: darken($brand-primary, 20%);
-                        }
-                    }
-
-                    &.facebook {
-                        background-color: $facebook-color;
-                        &:hover {
-                            background-color: darken($facebook-color, 20%);
-                        }
-                    }
-
-                    &.twitter {
-                        background-color: $twitter-color;
-                        &:hover {
-                            background-color: darken($twitter-color, 20%);
-                        }
-                    }
-
-                    &.linkedin {
-                        background-color: $linkedin-color;
-                        &:hover {
-                            background-color: darken($linkedin-color, 20%);
-                        }
-                    }
-
-                    &.youtube {
-                        background-color: $youtube-color;
-                        &:hover {
-                            background-color: darken($youtube-color, 20%);
-                        }
-                    }
-
-                    &.instagram {
-                        background-color: $instagram-color;
-                        &:hover {
-                            background-color: darken($instagram-color, 20%);
-                        }
-                    }
-
-                    &.whatsapp {
-                        background-color: $whatsapp-color;
-                        &:hover {
-                            background-color: darken($whatsapp-color, 20%);
-                        }
-                    }
-
-                    &.telegram {
-                        background-color: $telegram-color;
-
-                        &:hover {
-                            background-color: darken($telegram-color, 20%);
-                        }
-
-                        .fa {
-                            margin-left: -1px;
-                        }
-                    }
-
-                    &.tiktok {
-                        background-color: $tiktok-color;
-
-                        &:hover {
-                            background-color: darken($tiktok-color, 20%);
-                        }
-
-                        .fa {
-                            margin-left: -1px;
-                        }
-                    }
-
-                    &.pinterest {
-                        background-color: $pinterest-color;
-
-                        &:hover {
-                            background-color: darken($pinterest-color, 20%);
-                        }
-
-                        .fa {
-                            margin-left: -1px;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    .supportemail,
-    .logininfo,
-    .tool_dataprivacy{
-        margin: .5rem 0;
-    }
-
-    .column-center {
-        text-align: center;
-    }
-
-    .column-right {
-        text-align: right;
-
-        .stores {
-            a {
-                display: block;
-            }
-
-            img {
-                max-width: 160px;
-            }
-        }
-    }
-
-    .copyright {
-        background-color: $moodle-color;
-        text-align: center;
-        min-height: inherit;
+    .isp-footer-heading {
         color: #fff;
-        margin-bottom: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: .875rem;
+    }
 
-        .madeby {
-            padding: .5rem 0;
+    h2.footer-title {
+        color: #fff;
+        font-size: $h6-font-size;
+        font-weight: 700;
+        letter-spacing: .03em;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
 
-            p {
-                margin-bottom: 0;
+    .isp-footer-description,
+    .isp-footer-support-copy {
+        color: rgba(#fff, .86);
+        line-height: 1.65;
+        margin-bottom: 1.25rem;
+        max-width: 34rem;
+    }
+
+    .isp-footer-institution-link {
+        align-items: center;
+        border-bottom: 1px solid rgba(#fff, .65);
+        display: inline-flex;
+        font-weight: 600;
+        gap: .5rem;
+        padding-bottom: .2rem;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            border-color: #fff;
+            color: #fff;
+        }
+    }
+
+    .isp-footer-links {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li + li {
+            margin-top: .7rem;
+        }
+
+        a {
+            color: rgba(#fff, .9);
+            text-decoration: none;
+
+            &::before {
+                color: #fff;
+                content: '›';
+                font-size: 1.2rem;
+                font-weight: 700;
+                margin-right: .5rem;
+            }
+
+            &:hover,
+            &:focus {
+                color: #fff;
+                text-decoration: underline;
             }
         }
+    }
+
+    .supportemail {
+        margin: 0 0 1rem;
+
+        .contactsitesupport {
+            border-color: rgba(#fff, .72);
+            color: #fff;
+
+            &:hover,
+            &:focus {
+                background-color: #fff;
+                color: $brand-primary;
+            }
+        }
+    }
+
+    .isp-footer-system-links {
+        color: rgba(#fff, .8);
+        font-size: .9rem;
+
+        a {
+            color: #fff;
+        }
+    }
+
+    .isp-footer-legal {
+        background-color: darken($brand-primary, 22%);
+        clear: both;
+        color: rgba(#fff, .84);
+        display: block;
+        font-size: .8125rem;
+        margin-top: 0;
+        padding: 1rem 0;
+        width: 100%;
+    }
+
+    .isp-footer-legal-inner {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: .35rem;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .isp-footer-legal p {
+        margin: 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .isp-footer-legal a {
+        color: #fff;
+        font-weight: 600;
     }
 
     .btn-footer-popover {
@@ -212,15 +172,12 @@
 
 @include media-breakpoint-down(sm) {
     #page-footer {
-        .column-right,
-        .column-left {
-            text-align: center;
+        .isp-footer-main {
+            padding: 2.5rem 0 2rem;
         }
 
-        .column-center,
-        .column-right {
-            margin-top: 1rem;
+        .isp-footer-legal-inner {
+            gap: .45rem;
         }
     }
 }
-
