@@ -24,6 +24,6 @@ $CFG->dataroot = '/var/www/moodledata';
 $CFG->admin = 'admin';
 $CFG->directorypermissions = 02777;
 $CFG->routerconfigured = true;
-$CFG->customfrontpageinclude = __DIR__ . '/../public/local/beit_frontpage/frontpage.php';
+$CFG->customfrontpageinclude = __DIR__ . '/public/local/beit_frontpage/frontpage.php';
 
 require_once(__DIR__ . '/lib/setup.php');
