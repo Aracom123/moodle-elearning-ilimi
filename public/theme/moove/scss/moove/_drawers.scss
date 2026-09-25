@@ -1,3 +1,14 @@
+#page-wrapper {
+    // Let short pages fill the viewport while long pages extend naturally.
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    > #page.drawers {
+        flex: 1 0 auto;
+    }
+}
+
 #page,
 #page.drawers {
     margin-top: 70px;

@@ -14,7 +14,8 @@ until php -r '
             getenv("MOODLE_DB_HOST"),
             getenv("MOODLE_DB_USER"),
             getenv("MOODLE_DB_PASSWORD"),
-            getenv("MOODLE_DB_NAME")
+            getenv("MOODLE_DB_NAME"),
+            (int) (getenv("MOODLE_DB_PORT") ?: 3306)
         );
         exit($connection->connect_errno ? 1 : 0);
     }
@@ -36,7 +37,8 @@ if ! php -r '
         getenv("MOODLE_DB_HOST"),
         getenv("MOODLE_DB_USER"),
         getenv("MOODLE_DB_PASSWORD"),
-        getenv("MOODLE_DB_NAME")
+        getenv("MOODLE_DB_NAME"),
+        (int) (getenv("MOODLE_DB_PORT") ?: 3306)
     );
     $table = $connection->real_escape_string(getenv("MOODLE_DB_PREFIX") . "config");
     $result = $connection->query("SHOW TABLES LIKE \"{$table}\"");

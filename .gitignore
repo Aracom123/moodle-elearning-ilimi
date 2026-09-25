@@ -1,5 +1,8 @@
 # --- Config locale (contient les identifiants BDD) ---
 /config.php
+/.env
+/output/
+/tmp/
 
 # --- Archive d'installation Moodle (trop volumineuse pour GitHub) ---
 /moodle-latest-502.zip

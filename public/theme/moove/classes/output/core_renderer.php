@@ -40,6 +40,53 @@ use theme_moove\util\settings;
  */
 class core_renderer extends \theme_boost\output\core_renderer {
     /**
+     * Refresh the welcome name from the account record before rendering it.
+     *
+     * Moodle's welcome string is assembled from the session's cached $USER
+     * object. Refreshing only the name fields here prevents a stale profile
+     * object from showing another account's name after an account switch.
+     *
+     * @param string $templatename
+     * @param array|\stdClass $context
+     * @return string|boolean
+     */
+    public function render_from_template($templatename, $context) {
+        global $DB, $USER;
+
+        if ($templatename === 'core/full_header' && isloggedin() && !isguestuser()
+                && !\core\session\manager::is_loggedinas()) {
+            $welcome = is_array($context)
+                ? ($context['welcomemessage'] ?? null)
+                : ($context->welcomemessage ?? null);
+            if ($welcome instanceof \lang_string) {
+                $fields = \core_user\fields::get_name_fields();
+                $freshuser = $DB->get_record('user', ['id' => $USER->id], 'id,' . implode(',', $fields));
+                if ($freshuser) {
+                    $namefields = [
+                        'fullname' => fullname($freshuser),
+                        'alternativefullname' => fullname($freshuser, true),
+                    ];
+                    foreach ($fields as $field) {
+                        $namefields[$field] = $freshuser->{$field} ?? '';
+                    }
+                    $contextwelcomemessage = new \lang_string(
+                        $welcome->get_identifier(),
+                        $welcome->get_component(),
+                        $namefields
+                    );
+                    if (is_array($context)) {
+                        $context['welcomemessage'] = $contextwelcomemessage;
+                    } else {
+                        $context->welcomemessage = $contextwelcomemessage;
+                    }
+                }
+            }
+        }
+
+        return parent::render_from_template($templatename, $context);
+    }
+
+    /**
      * The standard tags (meta tags, links to stylesheets and JavaScript, etc.)
      * that should be included in the <head> tag. Designed to be called in theme
      * layout.php files.
@@ -498,7 +545,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
      * @return string My learning controls html content.
      */
     public function render_mylearning_controls() {
-        if (!isloggedin() || isguestuser()) {
+        if (!isloggedin() || isguestuser() || is_siteadmin()) {
             return '';
         }
 

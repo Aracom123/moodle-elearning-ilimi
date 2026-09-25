@@ -6,10 +6,16 @@ require_once dirname(__DIR__, 2) . '/config.php';
 use report_isplearninganalytics\local\analytics_service;
 
 require_login();
-$context = context_system::instance();
-require_capability('report/isplearninganalytics:view', $context);
-
 $courseid = optional_param('courseid', 0, PARAM_INT);
+$systemcontext = context_system::instance();
+$cansiteview = has_capability('report/isplearninganalytics:view', $systemcontext);
+if (!$cansiteview && $courseid <= 0) {
+    require_capability('report/isplearninganalytics:view', $systemcontext);
+}
+$context = $courseid > 0 ? context_course::instance($courseid) : $systemcontext;
+if (!$cansiteview && !has_capability('moodle/course:manageactivities', $context)) {
+    require_capability('report/isplearninganalytics:view', $context);
+}
 $period = optional_param('period', 90, PARAM_INT);
 $download = optional_param('download', '', PARAM_ALPHA);
 if (!in_array($period, [0, 30, 90, 365], true)) {
@@ -43,8 +49,9 @@ if ($download === 'csv') {
     $output = fopen('php://output', 'wb');
     fwrite($output, "\xEF\xBB\xBF");
     fputcsv($output, [
-        'Cours', 'Apprenant', 'Temps actif estimé', 'Sessions', 'Jours actifs',
-        'Événements', 'Participations', 'Progression (%)', 'Cours terminé', 'Note finale (%)', 'Dernier événement',
+        'Cours', 'Apprenant', 'Temps actif estimé (période)', 'Sessions (période)', 'Jours actifs (période)',
+        'Événements (période)', 'Participations (période)', 'Progression actuelle (%)',
+        'Cours terminé (état actuel)', 'Note finale actuelle (%)', 'Dernier événement (période)',
     ]);
     foreach ($data['rows'] as $row) {
         fputcsv($output, [
@@ -65,16 +72,21 @@ if ($download === 'csv') {
     exit;
 }
 
-$courseoptions = [0 => 'Tous les cours'];
+$courseoptions = $cansiteview ? [0 => 'Tous les cours'] : [];
 foreach ($DB->get_records_select('course', 'id <> :siteid AND visible = 1', ['siteid' => SITEID], 'sortorder', 'id,fullname') as $course) {
-    $courseoptions[$course->id] = format_string($course->fullname);
+    if ($cansiteview || has_capability('moodle/course:manageactivities', context_course::instance($course->id))) {
+        $courseoptions[$course->id] = format_string($course->fullname);
+    }
 }
 $periodoptions = [30 => '30 derniers jours', 90 => '90 derniers jours', 365 => '12 derniers mois', 0 => 'Tout l’historique'];
 
 echo $OUTPUT->header();
 echo html_writer::start_div('isp-analytics-intro');
 echo html_writer::tag('p',
-    'Vue consolidée de la progression, de la complétion, de la participation, des notes et du temps actif estimé.'
+    'Vue consolidée de la progression, de la complétion, de la participation, des notes et du temps actif estimé. '
+    . 'La période choisie filtre uniquement l’activité (temps, sessions, jours actifs, participations, événements et dernière activité). '
+    . 'Les inscriptions, la progression, la complétion et les notes reflètent leur état actuel.',
+    ['class' => 'isp-analytics-scope']
 );
 echo html_writer::tag('p',
     'Méthode du temps actif : les événements Moodle sont regroupés en sessions ; une interruption de plus de 30 minutes '
@@ -86,7 +98,7 @@ echo html_writer::end_div();
 echo html_writer::start_tag('form', ['method' => 'get', 'action' => (new moodle_url('/report/isplearninganalytics/index.php'))->out(false), 'class' => 'isp-analytics-filters']);
 echo html_writer::label('Cours', 'id_courseid');
 echo html_writer::select($courseoptions, 'courseid', $courseid, false, ['id' => 'id_courseid', 'class' => 'custom-select']);
-echo html_writer::label('Période', 'id_period');
+echo html_writer::label('Période d’activité', 'id_period');
 echo html_writer::select($periodoptions, 'period', $period, false, ['id' => 'id_period', 'class' => 'custom-select']);
 echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => 'Appliquer', 'class' => 'btn btn-primary']);
 echo html_writer::link(
@@ -100,7 +112,8 @@ echo $OUTPUT->heading('Vue par cours', 2);
 $summarytable = new html_table();
 $summarytable->attributes['class'] = 'generaltable isp-analytics-table';
 $summarytable->head = [
-    'Cours', 'Apprenants', 'Terminés', 'Progression moyenne', 'Temps actif moyen', 'Note moyenne', 'Participations', 'Événements',
+    'Cours', 'Apprenants inscrits', 'Terminés (état actuel)', 'Progression moyenne (état actuel)',
+    'Temps actif moyen (période)', 'Note moyenne (état actuel)', 'Participations (période)', 'Événements (période)',
 ];
 foreach ($data['summaries'] as $summary) {
     $summarytable->data[] = [
@@ -120,7 +133,9 @@ echo $OUTPUT->heading('Détail par apprenant', 2);
 $detailtable = new html_table();
 $detailtable->attributes['class'] = 'generaltable isp-analytics-table';
 $detailtable->head = [
-    'Cours', 'Apprenant', 'Temps actif', 'Sessions', 'Jours actifs', 'Participations', 'Progression', 'Terminé', 'Note', 'Dernière activité',
+    'Cours', 'Apprenant', 'Temps actif (période)', 'Sessions (période)', 'Jours actifs (période)',
+    'Participations (période)', 'Progression (état actuel)', 'Terminé (état actuel)',
+    'Note (état actuel)', 'Dernière activité (période)',
 ];
 foreach ($data['rows'] as $row) {
     $detailtable->data[] = [
@@ -133,7 +148,7 @@ foreach ($data['rows'] as $row) {
         format_float($row->completionpercent, 1) . ' %',
         $row->completed ? 'Oui' : 'Non',
         $row->gradepercent === null ? '—' : format_float($row->gradepercent, 1) . ' %',
-        $row->lastevent ? userdate($row->lastevent) : 'Jamais',
+        $row->lastevent ? userdate($row->lastevent) : 'Aucune sur la période',
     ];
 }
 echo html_writer::table($detailtable);

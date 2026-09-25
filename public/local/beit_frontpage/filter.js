@@ -24,6 +24,9 @@
         var catChecks = Array.prototype.slice.call(
             document.querySelectorAll('.beit-cat-check')
         );
+        var levelChecks = Array.prototype.slice.call(
+            document.querySelectorAll('.beit-level-check')
+        );
 
         var cards = Array.prototype.slice.call(
             grid.querySelectorAll('.beit-course-card')
@@ -49,6 +52,9 @@
             var selectedCats = catChecks
                 .filter(function (c) { return c.checked; })
                 .map(function (c) { return c.value; });
+            var selectedLevels = levelChecks
+                .filter(function (c) { return c.checked; })
+                .map(function (c) { return c.value; });
             var enrolFilter = enrolOnly && enrolOnly.checked;
 
             var visible = 0;
@@ -57,9 +63,11 @@
                     (card.dataset.search || '').indexOf(term) !== -1;
                 var matchCat = selectedCats.length === 0 ||
                     selectedCats.indexOf(card.dataset.category) !== -1;
+                var matchLevel = selectedLevels.length === 0 ||
+                    selectedLevels.indexOf(card.dataset.level) !== -1;
                 var matchEnrol = !enrolFilter || card.dataset.canenrol === '1';
 
-                var show = matchSearch && matchCat && matchEnrol;
+                var show = matchSearch && matchCat && matchLevel && matchEnrol;
                 card.style.display = show ? '' : 'none';
                 if (show) {
                     visible++;
@@ -92,6 +100,9 @@
                     case 'recent':
                         return (parseInt(b.dataset.timecreated, 10) || 0) -
                                (parseInt(a.dataset.timecreated, 10) || 0);
+                    case 'oldest':
+                        return (parseInt(a.dataset.timecreated, 10) || 0) -
+                               (parseInt(b.dataset.timecreated, 10) || 0);
                     default:
                         return (parseInt(a.dataset.order, 10) || 0) -
                                (parseInt(b.dataset.order, 10) || 0);
@@ -116,6 +127,9 @@
         catChecks.forEach(function (c) {
             c.addEventListener('change', apply);
         });
+        levelChecks.forEach(function (c) {
+            c.addEventListener('change', apply);
+        });
 
         if (resetBtn) {
             resetBtn.addEventListener('click', function () {
@@ -123,6 +137,7 @@
                 if (sortSelect) { sortSelect.value = 'default'; }
                 if (enrolOnly) { enrolOnly.checked = false; }
                 catChecks.forEach(function (c) { c.checked = false; });
+                levelChecks.forEach(function (c) { c.checked = false; });
                 apply();
             });
         }
@@ -132,6 +147,39 @@
             toggleBtn.addEventListener('click', function () {
                 filters.classList.toggle('beit-filters--open');
             });
+        }
+
+        var slider = document.querySelector('.beit-slideshow');
+        if (slider) {
+            var slides = Array.prototype.slice.call(slider.querySelectorAll('.beit-slide'));
+            var position = slider.querySelector('.beit-slide-position');
+            var index = 0;
+            var timer;
+            var showSlide = function (next) {
+                index = (next + slides.length) % slides.length;
+                slides.forEach(function (slide, i) {
+                    slide.hidden = i !== index;
+                    slide.classList.toggle('is-active', i === index);
+                });
+                if (position) { position.textContent = (index + 1) + ' / ' + slides.length; }
+            };
+            var restart = function () {
+                window.clearInterval(timer);
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    timer = window.setInterval(function () { showSlide(index + 1); }, 6500);
+                }
+            };
+            slider.querySelectorAll('[data-slide]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    showSlide(index + (button.dataset.slide === 'next' ? 1 : -1));
+                    restart();
+                });
+            });
+            slider.addEventListener('mouseenter', function () { window.clearInterval(timer); });
+            slider.addEventListener('mouseleave', restart);
+            slider.addEventListener('focusin', function () { window.clearInterval(timer); });
+            slider.addEventListener('focusout', restart);
+            restart();
         }
     }
 

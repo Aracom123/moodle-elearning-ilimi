@@ -100,12 +100,59 @@ Après un démarrage avec une base vide, une restauration de base ou une mise à
 jour des plugins, appliquez la configuration idempotente puis vérifiez-la :
 
 ```sh
+docker compose exec -T web php admin/cli/upgrade.php --non-interactive
 docker compose exec -T web php docker/configure-learning-platform.php
 docker compose exec -T web php docker/verify-learning-platform.php
 ```
 
 Le second script est en lecture seule. Une installation correctement
-configurée termine avec `49 contrôles, 0 échec(s)`.
+configurée termine actuellement avec `59 contrôles, 0 échec(s)`.
+
+### Création de cours par les enseignants
+
+Le module local `local_ispcoursecreation` donne aux enseignants le seul droit
+`moodle/course:create`, dans les catégories contenant un cours où ils ont le
+rôle « enseignant éditeur ». Il ne leur donne pas les autres permissions du rôle Moodle
+« créateur de cours ». Le droit est ajouté ou retiré automatiquement quand
+l’affectation comme enseignant change. Après une restauration de base ou une
+importation de rôles réalisée sans événements Moodle, réconciliez les droits :
+
+```sh
+docker compose exec -T web php docker/sync-teacher-course-creation.php
+```
+
+Le contrôle `docker/smoke-teacher-course-creation.php` vérifie aussi, avec le
+compte apprenant de démonstration, que ce droit apparaît lors d’une affectation
+enseignante puis disparaît quand celle-ci est retirée.
+
+Le rôle Moodle « enseignant non éditeur » n'est pas utilisé sur cette plateforme.
+Pour le retirer d'une installation restaurée, après avoir vérifié qu'aucun
+membre du personnel ne le possède encore :
+
+```sh
+docker compose exec -T web php docker/remove-nonediting-teacher-role.php
+```
+
+Le script refuse la suppression si le rôle est encore attribué à un compte
+autre que le compte de test historique ; il conserve ce compte test.
+
+### Certificats ISP
+
+Les deux activités de certificat utilisent un modèle A4 paysage commun : fond
+illustré, nom de l’apprenant et du cours renseignés par Moodle, date d’émission,
+code unique et QR pointant vers la page de vérification publique de Moodle.
+Pour réappliquer ce modèle aux activités existantes :
+
+```sh
+docker compose exec -T web php docker/apply-certificate-template.php
+```
+
+La signature intégrée est **fictive et ne doit pas être utilisée sur des
+certificats officiels**. Remplacez-la uniquement après réception et validation
+d’une signature autorisée par l’école. Le QR utilise
+`MOODLE_WWWROOT` : sur la production, configurez donc une URL HTTPS publique
+avant d’émettre des certificats ; les QR des PDF créés en local pointent vers
+`localhost` et ne peuvent pas être vérifiés depuis un autre appareil.
 
 Le tableau de bord analytique est disponible à :
 
@@ -205,6 +252,14 @@ mise en ligne, utilisez des secrets uniques, HTTPS, une URL publique correcte,
 des sauvegardes automatisées de MySQL et de `moodledata`, ainsi qu’un stockage
 persistant adapté. Ne publiez pas les identifiants fournis dans `compose.yaml`
 dans un environnement accessible depuis Internet.
+
+Pour un VPS cPanel où Apache utilise déjà les ports 80 et 443, le fichier
+`compose.production.yaml` exécute les conteneurs sur le réseau hôte et lie
+MySQL uniquement à `127.0.0.1:3307`. Créez un fichier `.env` privé avec
+`MOODLE_WWWROOT`, `MOODLE_DB_PASSWORD`, `MYSQL_ROOT_PASSWORD` et
+`MOODLE_ADMIN_PASSWORD` avant d’utiliser cet override. Il impose HTTPS côté
+Moodle ; Apache doit rediriger HTTP vers HTTPS et transmettre
+`X-Forwarded-Proto: https`.
 
 ## Licence
 

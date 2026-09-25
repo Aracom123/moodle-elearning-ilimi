@@ -19,6 +19,110 @@
     }
 }
 
+.isp-dashboard-native.is-suppressed { display: none; }
+
+.isp-role-dashboard {
+    color: #17324d;
+    margin: 0 0 2rem;
+
+    .isp-dashboard-lead {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 0 0 1.5rem;
+        h2 { color: #17324d; font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 750; margin-bottom: .35rem; }
+        p { color: #4e6174; margin: 0; }
+    }
+    .isp-dashboard-lead-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: .75rem; margin-left: auto; }
+    .isp-dashboard-courses-link { color: #1762a2; font-weight: 650; min-height: 2.5rem; display: inline-flex; align-items: center; }
+    .isp-dashboard-courses-link:hover { color: #104b80; }
+    .isp-dashboard-courses-link:focus-visible { outline: 3px solid #80b7e4; outline-offset: 2px; }
+
+    .isp-dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: .85rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .isp-dashboard-stat {
+        background: #f2f6fa;
+        border-radius: 12px;
+        color: #17324d;
+        display: flex;
+        flex-direction: column;
+        gap: .45rem;
+        padding: 1.15rem 1.3rem;
+        text-decoration: none;
+    }
+
+    a.isp-dashboard-stat:hover,
+    a.isp-dashboard-stat:focus-visible { background: #e7f0f9; text-decoration: none; }
+    .isp-dashboard-stat-label { color: #455d71; font-size: .83rem; font-weight: 650; }
+    .isp-dashboard-stat-value { color: #17324d; font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; }
+
+    .isp-dashboard-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .isp-dashboard-panel { border: 1px solid #d6e0ea; border-radius: 12px; padding: 1.35rem; min-width: 0; }
+    .isp-dashboard-panel h3 { color: #17324d; font-size: 1.15rem; font-weight: 720; margin-bottom: 1rem; }
+    .isp-dashboard-create-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }
+    .isp-dashboard-create-course {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.5rem;
+        padding: .45rem .85rem;
+        border-radius: .5rem;
+        background: #1762a2;
+        color: #fff;
+        font-size: .9rem;
+        font-weight: 650;
+        line-height: 1.3;
+        text-decoration: none;
+    }
+    .isp-dashboard-create-course:hover,
+    .isp-dashboard-create-course:focus-visible { background: #104b80; color: #fff; text-decoration: none; }
+    .isp-dashboard-create-course:focus-visible { outline: 3px solid #80b7e4; outline-offset: 2px; }
+    .isp-dashboard-empty,
+    .isp-dashboard-note { color: #4e6174; font-size: .9rem; line-height: 1.5; }
+    .isp-dashboard-link-list { list-style: none; padding: 0; margin: 0; }
+    .isp-dashboard-link-list li { display: flex; justify-content: space-between; gap: 1rem; padding: .75rem 0; border-top: 1px solid #e8eef3; }
+    .isp-dashboard-link-list li:first-child { border-top: 0; padding-top: 0; }
+    .isp-dashboard-link-list span { color: #4e6174; font-size: .85rem; white-space: nowrap; }
+    .isp-dashboard-link-list a,
+    .isp-dashboard-actions a { color: #1762a2; font-weight: 650; }
+    .isp-dashboard-panel > a { color: #1762a2; font-weight: 650; }
+    .isp-dashboard-report-chooser summary { color: #1762a2; cursor: pointer; font-weight: 650; }
+    .isp-dashboard-report-chooser summary:focus-visible { outline: 3px solid #80b7e4; outline-offset: 2px; }
+    .isp-dashboard-report-chooser .isp-dashboard-link-list { margin-top: .75rem; }
+    .isp-dashboard-actions { display: flex; flex-wrap: wrap; gap: .75rem 1.5rem; }
+    .isp-teacher-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .isp-teacher-chart-wide { grid-column: 1 / -1; }
+    .isp-teacher-chart-rows { display: grid; gap: 1rem; max-height: 22rem; overflow-y: auto; padding-right: .25rem; }
+    .isp-teacher-chart-meta { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; margin-bottom: .4rem; font-size: .88rem; }
+    .isp-teacher-chart-meta span { min-width: 0; overflow-wrap: anywhere; }
+    .isp-teacher-chart-meta strong { flex: none; font-variant-numeric: tabular-nums; }
+    .isp-teacher-chart-track { height: .65rem; background: #edf2f7; border-radius: 1rem; overflow: hidden; }
+    .isp-teacher-chart-track span { display: block; height: 100%; background: #2a69b8; border-radius: inherit; }
+    .isp-teacher-week-chart { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 1rem; min-height: 9rem; }
+    .isp-teacher-week { display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; font-size: .8rem; color: #455d71; }
+    .isp-teacher-week strong { color: #17324d; font-size: 1rem; font-variant-numeric: tabular-nums; }
+    .isp-teacher-week-track { display: flex; align-items: end; width: min(5rem, 100%); height: 5rem; background: #edf2f7; border-radius: 5px 5px 0 0; overflow: hidden; }
+    .isp-teacher-week-track span { display: block; width: 100%; background: #2a69b8; border-radius: 5px 5px 0 0; }
+    .isp-engagement-chart { align-items: end; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .55rem; min-height: 155px; }
+    .isp-engagement-month { align-items: center; display: flex; flex-direction: column; gap: .4rem; font-size: .78rem; }
+    .isp-engagement-amount { color: #314c65; font-variant-numeric: tabular-nums; }
+    .isp-engagement-track { align-items: end; display: flex; width: min(2.4rem, 100%); height: 100px; background: #edf2f7; border-radius: 5px 5px 0 0; overflow: hidden; }
+    .isp-engagement-track span { display: block; width: 100%; background: #2a69b8; min-height: 2px; border-radius: 5px 5px 0 0; }
+    .isp-engagement-label { color: #4e6174; }
+}
+
+@include media-breakpoint-down(md) {
+    .isp-role-dashboard .isp-dashboard-panels { grid-template-columns: 1fr; }
+    .isp-role-dashboard .isp-teacher-charts { grid-template-columns: 1fr; }
+    .isp-role-dashboard .isp-dashboard-link-list li { flex-direction: column; gap: .2rem; }
+}
+
 #page-my-index.page-mycourses {
     .header-actions-container .header-action .btn-group > .btn:not(:last-child):not(.dropdown-toggle) {
         background-color: $brand-primary;

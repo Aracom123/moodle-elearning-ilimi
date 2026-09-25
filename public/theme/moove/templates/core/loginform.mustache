@@ -23,7 +23,6 @@
     * autofocusform: Auto focus on form ?,
     * canloginasguest - Is guest login allowed?,
     * canloginbyemail - Is login by email allowed?,
-    * cansignup - Signup allowed?,
     * showloginform - Hide the standard login form if it not necessary (only OAuth2 for example)
     * error - Any errors in the form?,
     * errortitle - Optional bold heading shown above the error message (credential failures only),
@@ -34,7 +33,6 @@
     * identityproviders - List of identity providers,
     * instructions - Instructions,
     * loginurl - Login url,
-    * signupurl - Signup url,
     * logourl - Flag, logo url,
     * sitename - Name of site.,
     * logintoken - Random token to protect login request.,
@@ -45,7 +43,6 @@
         "autofocusform": false,
         "canloginasguest": "1",
         "canloginbyemail": false,
-        "cansignup": true,
         "showloginform": true,
         "error": "",
         "errortitle": "",
@@ -56,7 +53,6 @@
         "identityproviders": [],
         "instructions": "For full access to this site, you first need to create an account.",
         "loginurl": "http://localhost/stable_master/login/index.php",
-        "signupurl": "http://localhost/stable_master/login/signup.php",
         "logourl": false,
         "sitename": "Beer & Chips",
         "logintoken": "randomstring",
@@ -139,26 +135,9 @@
         </div>
     {{/hasauthinstructions}}
     {{^hasauthinstructions}}
-        {{#cansignup}}
-            <div class="text-center small mb-3">
-                {{#instructions}}
-                    <span class="text-muted me-1">{{{instructions}}}</span>
-                {{/instructions}}
-                <a href="{{signupurl}}">{{#str}}loginstartsignup{{/str}}</a>
-            </div>
-        {{/cansignup}}
-        {{^cansignup}}
-            {{#instructions}}
-                <p class="small mb-3">{{{instructions}}}</p>
-            {{/instructions}}
-        {{/cansignup}}
-    {{/hasauthinstructions}}
-    {{#hasauthinstructions}}
-        {{#cansignup}}
-            <div class="text-center small mb-3">
-                <a href="{{signupurl}}">{{#str}}loginstartsignup{{/str}}</a>
-            </div>
-        {{/cansignup}}
+        {{#instructions}}
+            <p class="small mb-3">{{{instructions}}}</p>
+        {{/instructions}}
     {{/hasauthinstructions}}
     {{#hasidentityproviders}}
         <div class="login-separator my-5">{{#str}}loginseparatoror{{/str}}</div>

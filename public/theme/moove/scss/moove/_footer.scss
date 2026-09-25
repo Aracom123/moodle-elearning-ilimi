@@ -10,125 +10,6 @@
         color: #fff;
     }
 
-    .popover.footer .popover-body .footer-section {
-        color: #1d2125;
-
-        a {
-            color: #1d2125;
-        }
-    }
-
-    .isp-footer-main {
-        background:
-            linear-gradient(120deg, rgba($brand-primary, .98), rgba(darken($brand-primary, 18%), .98)),
-            $brand-primary;
-        padding: 3.5rem 0 2.75rem;
-    }
-
-    .isp-footer-kicker {
-        color: rgba(#fff, .75);
-        font-size: .8125rem;
-        font-weight: 700;
-        letter-spacing: .1em;
-        margin-bottom: .5rem;
-        text-transform: uppercase;
-    }
-
-    .isp-footer-heading {
-        color: #fff;
-        font-size: 1.75rem;
-        font-weight: 700;
-        line-height: 1.2;
-        margin-bottom: .875rem;
-    }
-
-    h2.footer-title {
-        color: #fff;
-        font-size: $h6-font-size;
-        font-weight: 700;
-        letter-spacing: .03em;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-        text-transform: uppercase;
-    }
-
-    .isp-footer-description,
-    .isp-footer-support-copy {
-        color: rgba(#fff, .86);
-        line-height: 1.65;
-        margin-bottom: 1.25rem;
-        max-width: 34rem;
-    }
-
-    .isp-footer-institution-link {
-        align-items: center;
-        border-bottom: 1px solid rgba(#fff, .65);
-        display: inline-flex;
-        font-weight: 600;
-        gap: .5rem;
-        padding-bottom: .2rem;
-        text-decoration: none;
-
-        &:hover,
-        &:focus {
-            border-color: #fff;
-            color: #fff;
-        }
-    }
-
-    .isp-footer-links {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-
-        li + li {
-            margin-top: .7rem;
-        }
-
-        a {
-            color: rgba(#fff, .9);
-            text-decoration: none;
-
-            &::before {
-                color: #fff;
-                content: '›';
-                font-size: 1.2rem;
-                font-weight: 700;
-                margin-right: .5rem;
-            }
-
-            &:hover,
-            &:focus {
-                color: #fff;
-                text-decoration: underline;
-            }
-        }
-    }
-
-    .supportemail {
-        margin: 0 0 1rem;
-
-        .contactsitesupport {
-            border-color: rgba(#fff, .72);
-            color: #fff;
-
-            &:hover,
-            &:focus {
-                background-color: #fff;
-                color: $brand-primary;
-            }
-        }
-    }
-
-    .isp-footer-system-links {
-        color: rgba(#fff, .8);
-        font-size: .9rem;
-
-        a {
-            color: #fff;
-        }
-    }
-
     .isp-footer-legal {
         background-color: darken($brand-primary, 22%);
         clear: both;
@@ -143,17 +24,16 @@
     .isp-footer-legal-inner {
         align-items: center;
         display: flex;
-        flex-direction: column;
-        gap: .35rem;
-        justify-content: center;
-        text-align: center;
+        flex-direction: row;
+        gap: 1rem;
+        justify-content: space-between;
+        text-align: left;
         width: 100%;
     }
 
     .isp-footer-legal p {
         margin: 0;
-        text-align: center;
-        width: 100%;
+        width: auto;
     }
 
     .isp-footer-legal a {
@@ -170,14 +50,26 @@
     }
 }
 
+// Moodle appends the help popover to <body>, outside #page-footer.
+.popover.footer .popover-body .footer-section {
+    color: var(--bs-popover-body-color);
+
+    a,
+    a .icon {
+        color: var(--bs-popover-body-color);
+    }
+}
+
 @include media-breakpoint-down(sm) {
     #page-footer {
-        .isp-footer-main {
-            padding: 2.5rem 0 2rem;
+        .isp-footer-legal-inner {
+            flex-direction: column;
+            gap: .45rem;
+            text-align: center;
         }
 
-        .isp-footer-legal-inner {
-            gap: .45rem;
+        .isp-footer-legal p {
+            text-align: center;
         }
     }
 }

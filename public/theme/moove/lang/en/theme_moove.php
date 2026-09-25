@@ -215,3 +215,5 @@ $string['logodarkdesc'] = 'Logo displayed in the header when dark mode is enable
 
 $string['mylearning'] = 'My learning';
 $string['nolearning'] = 'You haven\'t started your learning yet';
+$string['footerdevelopedby'] = 'Developed by';
+$string['footerpoweredby'] = 'Powered by';

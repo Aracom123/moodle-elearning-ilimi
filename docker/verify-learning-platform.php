@@ -43,6 +43,7 @@ $check('Statistiques Moodle', !empty($CFG->enablestats));
 $check('Complétion', !empty($CFG->enablecompletion));
 $check('Badges', !empty($CFG->enablebadges));
 $check('Rapports personnalisés', !empty($CFG->enablecustomreports));
+$check('Édition du tableau de bord désactivée', !empty($CFG->forcedefaultmymoodle));
 $check('Compétences', (bool) get_config('core_competency', 'enabled'));
 $check(
     'Custom certificate 5.2.5 installé',
@@ -57,6 +58,70 @@ $check(
         && (int) get_config('customcert', 'useadhoc') === 1,
     'vérification publique, retour au cours, tâches asynchrones'
 );
+$coursecreatorrole = $DB->get_record('role', ['shortname' => 'isp_course_creator']);
+$coursecreatorcapabilities = $coursecreatorrole
+    ? $DB->get_records('role_capabilities', ['roleid' => $coursecreatorrole->id]) : [];
+$check(
+    'Rôle dédié à la création de cours',
+    $coursecreatorrole
+        && count($coursecreatorcapabilities) === 1
+        && reset($coursecreatorcapabilities)->capability === 'moodle/course:create'
+        && (int)reset($coursecreatorcapabilities)->permission === CAP_ALLOW
+);
+$check('Rôle enseignant non éditeur absent', !$DB->record_exists('role', ['shortname' => 'teacher']));
+$teachercategoryaccess = true;
+$teachercategorycount = 0;
+$teacherpairs = $DB->get_recordset_sql(
+    "SELECT DISTINCT ra.userid, co.category
+       FROM {role_assignments} ra
+       JOIN {role} r ON r.id = ra.roleid
+       JOIN {context} ctx ON ctx.id = ra.contextid AND ctx.contextlevel = :courselevel
+       JOIN {course} co ON co.id = ctx.instanceid
+       JOIN {user} u ON u.id = ra.userid AND u.deleted = 0 AND u.suspended = 0
+      WHERE r.shortname = 'editingteacher'",
+    ['courselevel' => CONTEXT_COURSE]
+);
+foreach ($teacherpairs as $pair) {
+    if (is_siteadmin($pair->userid)) {
+        continue;
+    }
+    $teacher = $DB->get_record('user', ['id' => $pair->userid], '*', MUST_EXIST);
+    $teachercategoryaccess = $teachercategoryaccess && has_capability(
+        'moodle/course:create', context_coursecat::instance($pair->category), $teacher
+    );
+    $teachercategorycount++;
+}
+$teacherpairs->close();
+$check('Création autorisée dans les catégories enseignées', $teachercategoryaccess,
+    (string)$teachercategorycount . ' affectation(s) vérifiée(s)');
+$testlearner = $DB->get_record('user', ['username' => 'student.ia.test']);
+$testcourse = $DB->get_record('course', ['shortname' => 'IA-SANTE-PUBLIQUE-TEST']);
+$check('Création de cours refusée aux apprenants', $testlearner && $testcourse
+    && !has_capability('moodle/course:create', context_coursecat::instance($testcourse->category), $testlearner));
+$checkcertificatelayout = static function(stdClass $certificate) use ($DB, $check): void {
+    $page = $DB->get_record('customcert_pages', ['templateid' => $certificate->templateid]);
+    $elements = $page ? $DB->get_records('customcert_elements', ['pageid' => $page->id]) : [];
+    $types = [];
+    foreach ($elements as $element) {
+        $types[$element->name] = $element->element;
+    }
+    $check(
+        'Modèle A4 et vérification QR — ' . $certificate->name,
+        $page && (int)$page->width === 297 && (int)$page->height === 210
+            && (int)$certificate->verifyany === 1
+            && ($types['QR code de vérification'] ?? '') === 'qrcode'
+            && ($types['Code de vérification'] ?? '') === 'code'
+            && ($types['Nom de l’apprenant'] ?? '') === 'studentname'
+            && ($types['Nom du cours'] ?? '') === 'coursename'
+    );
+    $check(
+        'Habillage et emplacement de signature — ' . $certificate->name,
+        ($types['Fond du certificat'] ?? '') === 'bgimage'
+            && ($types['Logo officiel ISP'] ?? '') === 'image'
+            && ($types['Signature de démonstration'] ?? '') === 'image'
+            && !isset($types['Mention signature de démonstration'])
+    );
+};
 
 $check(
     'Annonce d’accueil',
@@ -127,6 +192,7 @@ if ($badgerecord) {
 $certificate = $DB->get_record('customcert', ['course' => 6]);
 $check('Certificat personnalisé', (bool) $certificate);
 if ($certificate) {
+    $checkcertificatelayout($certificate);
     $cm = get_coursemodule_from_instance('customcert', $certificate->id, 6, false, MUST_EXIST);
     $availability = json_decode((string) $cm->availability, true);
     $check(
@@ -158,13 +224,22 @@ if ($aicourse) {
     $check('Quiz final IA', (bool) $aiquiz);
     if ($aiquiz) {
         $aiquizcm = get_coursemodule_from_instance('quiz', $aiquiz->id, $aicourse->id, false, MUST_EXIST);
+        $aigradeitem = $DB->get_record('grade_items', [
+            'courseid' => $aicourse->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'quiz',
+            'iteminstance' => $aiquiz->id,
+            'itemnumber' => 0,
+        ]);
         $aiquestioncount = $DB->count_records('quiz_slots', ['quizid' => $aiquiz->id]);
         $check('Questions du quiz IA', $aiquestioncount >= 3, (string) $aiquestioncount);
         $check(
             'Seuil de réussite du quiz IA',
-            (int) $aiquizcm->completionpassgrade === 70
-                && (int) $aiquizcm->completiongradeitemnumber === 0,
-            'seuil ' . $aiquizcm->completionpassgrade . ' %'
+            (int) $aiquizcm->completionpassgrade === 1
+                && (int) $aiquizcm->completiongradeitemnumber === 0
+                && $aigradeitem
+                && abs((float) $aigradeitem->gradepass - (float) $aigradeitem->grademax * 0.70) < 0.00001,
+            'note de passage ' . ($aigradeitem->gradepass ?? 'absente')
         );
         $aicriterion = $DB->record_exists('course_completion_criteria', [
             'course' => $aicourse->id,
@@ -179,6 +254,7 @@ if ($aicourse) {
         ]);
         $check('Certificat final IA', (bool) $aicertificate);
         if ($aicertificate) {
+            $checkcertificatelayout($aicertificate);
             $aicertcm = get_coursemodule_from_instance('customcert', $aicertificate->id, $aicourse->id, false, MUST_EXIST);
             $aiavailability = json_decode((string) $aicertcm->availability, true);
             $check(
@@ -223,7 +299,7 @@ if ($analyticsreport) {
 
 $check(
     'Extension analytique ISP',
-    (int) get_config('report_isplearninganalytics', 'version') === 2026081000,
+    (int) get_config('report_isplearninganalytics', 'version') >= 2026092300,
     (string) get_config('report_isplearninganalytics', 'version')
 );
 $enabledstores = (string) get_config('tool_log', 'enabled_stores');
@@ -234,6 +310,14 @@ $configlogcount = $DB->count_records('config_log');
 $check('Historique des configurations', $configlogcount > 0, (string) $configlogcount);
 $analyticsservice = new \report_isplearninganalytics\local\analytics_service();
 $analyticsdata = $analyticsservice->get_report(90, 0);
+$allactiveenrolments = true;
+foreach ($analyticsdata['rows'] as $row) {
+    if (!is_enrolled(context_course::instance($row->courseid), $row->userid, '', true)) {
+        $allactiveenrolments = false;
+        break;
+    }
+}
+$check('Rapport limité aux inscriptions actives', $allactiveenrolments);
 $realcoursecount = $DB->count_records_select('course', 'id <> :siteid', ['siteid' => SITEID]);
 $check(
     'Calcul du temps actif',

@@ -18,8 +18,10 @@ ob_start();
 require($CFG->dirroot . '/index.php');
 $html = ob_get_clean();
 
-if (strlen($html) < 1000 || !str_contains($html, 'course-content')) {
-    fwrite(STDERR, "Homepage content was not rendered as expected.\n");
+if (strlen($html) < 1000 || !str_contains($html, 'beit-catalog') || !str_contains($html, 'beit-course-card')) {
+    fwrite(STDERR, "Homepage content was not rendered as expected (bytes=" . strlen($html)
+        . ", catalog=" . (str_contains($html, 'beit-catalog') ? 'yes' : 'no')
+        . ", cards=" . (str_contains($html, 'beit-course-card') ? 'yes' : 'no') . ").\n");
     exit(1);
 }
 

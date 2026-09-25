@@ -10,6 +10,8 @@ require_once $CFG->dirroot . '/course/lib.php';
 require_once $CFG->dirroot . '/course/modlib.php';
 require_once $CFG->dirroot . '/lib/resourcelib.php';
 require_once $CFG->dirroot . '/lib/questionlib.php';
+require_once $CFG->libdir . '/gradelib.php';
+require_once $CFG->libdir . '/completionlib.php';
 require_once $CFG->dirroot . '/completion/criteria/completion_criteria_activity.php';
 require_once $CFG->dirroot . '/completion/completion_aggregation.php';
 require_once $CFG->dirroot . '/mod/quiz/locallib.php';
@@ -216,7 +218,7 @@ if (!$quiz) {
         'completion' => COMPLETION_TRACKING_AUTOMATIC,
         'completionview' => COMPLETION_VIEW_NOT_REQUIRED,
         'completionusegrade' => 1,
-        'completionpassgrade' => 70,
+        'completionpassgrade' => 1,
         'completionunlocked' => 1,
         'visible' => 1,
     ];
@@ -296,12 +298,42 @@ XML;
 }
 
 $quizcm = get_coursemodule_from_instance('quiz', $quiz->id, $course->id, false, MUST_EXIST);
+$quizgradeitem = grade_item::fetch([
+    'courseid' => $course->id,
+    'itemtype' => 'mod',
+    'itemmodule' => 'quiz',
+    'iteminstance' => $quiz->id,
+    'itemnumber' => 0,
+]);
+if (!$quizgradeitem) {
+    throw new moodle_exception('Élément de note introuvable pour le quiz final IA.');
+}
+$passinggrade = round((float) $quizgradeitem->grademax * 0.70, 5);
+$completionchanged = false;
 if ((int) $quizcm->completion !== COMPLETION_TRACKING_AUTOMATIC
-        || (int) $quizcm->completionpassgrade !== 70
+        || (int) $quizcm->completionpassgrade !== 1
         || (int) $quizcm->completiongradeitemnumber !== 0) {
     $DB->set_field('course_modules', 'completion', COMPLETION_TRACKING_AUTOMATIC, ['id' => $quizcm->id]);
-    $DB->set_field('course_modules', 'completionpassgrade', 70, ['id' => $quizcm->id]);
+    $DB->set_field('course_modules', 'completionpassgrade', 1, ['id' => $quizcm->id]);
     $DB->set_field('course_modules', 'completiongradeitemnumber', 0, ['id' => $quizcm->id]);
+    $completionchanged = true;
+}
+if (abs((float) $quizgradeitem->gradepass - $passinggrade) > 0.00001) {
+    $quizgradeitem->gradepass = $passinggrade;
+    if (!$quizgradeitem->update('mod/quiz')) {
+        throw new moodle_exception('Impossible de définir la note de passage du quiz final IA.');
+    }
+    $completionchanged = true;
+}
+if ($completionchanged) {
+    rebuild_course_cache($course->id, true);
+    $quizcm = get_fast_modinfo($course->id)->get_cm($quizcm->id);
+    $completion = new completion_info($course);
+    $gradedusers = $DB->get_records('grade_grades', ['itemid' => $quizgradeitem->id], '', 'id,userid');
+    foreach ($gradedusers as $gradeduser) {
+        $completion->update_state($quizcm, COMPLETION_UNKNOWN, (int) $gradeduser->userid);
+    }
+    $aimessages[] = 'Seuil de réussite à 70 % et états de complétion du quiz IA synchronisés.';
 }
 
 // Course completion is tied to passing the final quiz. Moodle stores the
@@ -399,6 +431,8 @@ if (!$certificate) {
     }
     $aimessages[] = 'Certificat final IA créé.';
 }
+require_once __DIR__ . '/certificate-template.php';
+isp_apply_certificate_template($certificate);
 $certificatecm = get_coursemodule_from_instance('customcert', $certificate->id, $course->id, false, MUST_EXIST);
 $availability = json_encode([
     'op' => '&',

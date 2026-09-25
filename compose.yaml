@@ -1,13 +1,15 @@
 x-moodle-environment: &moodle-environment
-  MOODLE_WWWROOT: http://localhost:8080
+  MOODLE_WWWROOT: ${MOODLE_WWWROOT:-http://localhost:8080}
+  MOODLE_SSLPROXY: ${MOODLE_SSLPROXY:-false}
   MOODLE_DB_TYPE: mysqli
   MOODLE_DB_HOST: db
+  MOODLE_DB_PORT: "3306"
   MOODLE_DB_NAME: elearning_db
   MOODLE_DB_USER: moodle
-  MOODLE_DB_PASSWORD: moodle
+  MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD:-moodle}
   MOODLE_DB_PREFIX: el_
   MOODLE_ADMIN_USER: admin
-  MOODLE_ADMIN_PASSWORD: Admin123!
+  MOODLE_ADMIN_PASSWORD: ${MOODLE_ADMIN_PASSWORD:-Admin123!}
   MOODLE_ADMIN_EMAIL: admin@example.test
   MOODLE_SITE_NAME: ILIMI E-learning
   MOODLE_SITE_SHORTNAME: ILIMI
@@ -19,10 +21,10 @@ services:
     environment:
       MYSQL_DATABASE: elearning_db
       MYSQL_USER: moodle
-      MYSQL_PASSWORD: moodle
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: ${MOODLE_DB_PASSWORD:-moodle}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping --host=localhost --user=root --password=root --silent"]
+      test: ["CMD-SHELL", "mysqladmin ping --host=localhost --user=root --password=\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -44,7 +46,7 @@ services:
       timeout: 5s
       retries: 20
     ports:
-      - "8080:8080"
+      - "${MOODLE_BIND_ADDRESS:-0.0.0.0}:8080:8080"
     volumes:
       - .:/var/www/moodle
       - composer_vendor:/var/www/moodle/vendor

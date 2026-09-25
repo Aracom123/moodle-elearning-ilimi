@@ -24,6 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+global $USER;
+
 require_once($CFG->libdir . '/behat/lib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 
@@ -52,6 +54,29 @@ $hasblocks = (strpos($blockshtml, 'data-block=') !== false || !empty($addblockbu
 
 $addcontentblockbutton = $OUTPUT->addblockbutton('content');
 $contentblocks = $OUTPUT->custom_block_region('content');
+
+$ispdashboardhtml = '';
+$ispdashboardreplacesblocks = false;
+$ispmycoursespage = $PAGE->url->compare(new moodle_url('/my/courses.php'), URL_MATCH_BASE);
+if ($PAGE->url->compare(new moodle_url('/my/index.php'), URL_MATCH_BASE)
+        && isloggedin() && !isguestuser()) {
+    $dashboard = \theme_moove\local\role_dashboard::render((int) $USER->id);
+    $ispdashboardhtml = $dashboard['html'];
+    $ispdashboardreplacesblocks = true;
+    // /my/index.php renders this region itself. Rendering it here too creates
+    // duplicate Overview and Timeline blocks.
+    $addcontentblockbutton = '';
+    $contentblocks = '';
+} else if ($ispmycoursespage) {
+    // /my/courses.php already outputs its course overview in main_content.
+    // Do not render the same block a second time above the page content.
+    $addcontentblockbutton = '';
+    $contentblocks = '';
+    if (isloggedin() && !isguestuser()
+            && \theme_moove\local\profile_navigation::is_learner((int) $USER->id)) {
+        $ispdashboardhtml = \theme_moove\local\role_dashboard::render((int) $USER->id, true)['html'];
+    }
+}
 
 if (!$hasblocks) {
     $blockdraweropen = false;
@@ -90,7 +115,7 @@ if ($PAGE->has_secondary_navigation()) {
 
 $primary = new core\navigation\output\primary($PAGE);
 $renderer = $PAGE->get_renderer('core');
-$primarymenu = $primary->export_for_template($renderer);
+$primarymenu = \theme_moove\local\profile_navigation::filter_primary_menu($primary->export_for_template($renderer));
 $buildregionmainsettings = !$PAGE->include_region_main_settings_in_header_actions() && !$PAGE->has_secondary_navigation();
 // If the settings menu will be included in the header then don't add it here.
 $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settings_menu() : false;
@@ -121,6 +146,9 @@ $templatecontext = [
     'addblockbutton' => $addblockbutton,
     'addcontentblockbutton' => $addcontentblockbutton,
     'contentblocks' => $contentblocks,
+    'ispdashboardhtml' => $ispdashboardhtml,
+    'ispdashboardreplacesblocks' => $ispdashboardreplacesblocks,
+    'ispmycoursespage' => $ispmycoursespage,
 ];
 
 $themesettings = new \theme_moove\util\settings();

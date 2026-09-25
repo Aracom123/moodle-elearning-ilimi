@@ -27,11 +27,16 @@ final class analytics_service {
     public function get_report(int $perioddays = 90, int $courseid = 0): array {
         global $DB;
 
-        $since = $perioddays > 0 ? time() - ($perioddays * DAYSECS) : 0;
+        $now = time();
+        $since = $perioddays > 0 ? $now - ($perioddays * DAYSECS) : 0;
         $params = [
             'contextlevel' => CONTEXT_COURSE,
             'studentrole' => 'student',
             'siteid' => SITEID,
+            'enrolactive' => ENROL_USER_ACTIVE,
+            'enrolenabled' => ENROL_INSTANCE_ENABLED,
+            'nowstart' => $now,
+            'nowend' => $now,
         ];
         $coursewhere = '';
         if ($courseid > 0) {
@@ -39,7 +44,7 @@ final class analytics_service {
             $params['courseid'] = $courseid;
         }
 
-        $sql = "SELECT CONCAT(c.id, '-', u.id) AS pairid,
+        $sql = "SELECT DISTINCT CONCAT(c.id, '-', u.id) AS pairid,
                        c.id AS courseid, c.fullname AS coursename,
                        u.id AS userid, u.firstname, u.lastname
                   FROM {course} c
@@ -48,7 +53,16 @@ final class analytics_service {
                   JOIN {role_assignments} ra ON ra.contextid = ctx.id
                   JOIN {role} r ON r.id = ra.roleid AND r.shortname = :studentrole
                   JOIN {user} u ON u.id = ra.userid AND u.deleted = 0 AND u.suspended = 0
-                 WHERE c.id <> :siteid {$coursewhere}
+                 WHERE c.id <> :siteid
+                   AND EXISTS (
+                       SELECT 1
+                         FROM {user_enrolments} ue
+                         JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = c.id
+                        WHERE ue.userid = u.id
+                          AND ue.status = :enrolactive AND e.status = :enrolenabled
+                          AND ue.timestart < :nowstart
+                          AND (ue.timeend = 0 OR ue.timeend > :nowend)
+                   ) {$coursewhere}
               ORDER BY c.sortorder, u.lastname, u.firstname";
         $pairs = $DB->get_records_sql($sql, $params);
 

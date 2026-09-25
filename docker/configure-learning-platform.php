@@ -26,6 +26,30 @@ $admin = get_admin();
 $messages = [];
 $systemcontext = context_system::instance();
 
+// The platform uses editing teachers only. Preserve real staff access until a
+// human reviews any legacy non-editing assignment before removing the role.
+$noneditingrole = $DB->get_record('role', ['shortname' => 'teacher']);
+if ($noneditingrole) {
+    if ($noneditingrole->archetype !== 'teacher') {
+        throw new RuntimeException('Le rôle « teacher » ne correspond pas à l’archétype Moodle attendu.');
+    }
+    $assignedusers = $DB->get_fieldset_sql(
+        "SELECT DISTINCT u.username
+           FROM {role_assignments} ra
+           JOIN {user} u ON u.id = ra.userid
+          WHERE ra.roleid = :roleid",
+        ['roleid' => $noneditingrole->id]
+    );
+    foreach ($assignedusers as $username) {
+        if ($username !== 'qa.enseignant.non.editeur.isp.20260925') {
+            throw new RuntimeException('Le rôle enseignant non éditeur est encore affecté à ' . $username
+                . ' ; vérifier cette affectation avant de relancer la configuration.');
+        }
+    }
+    delete_role((int)$noneditingrole->id);
+    $messages[] = 'Rôle enseignant non éditeur supprimé.';
+}
+
 // Platform-wide switches and sensible defaults for new courses.
 foreach ([
     'enableanalytics' => 1,
@@ -33,6 +57,7 @@ foreach ([
     'enablecompletion' => 1,
     'enablebadges' => 1,
     'enablecustomreports' => 1,
+    'forcedefaultmymoodle' => 1,
     'badges_allowcoursebadges' => 1,
 ] as $name => $value) {
     set_config($name, $value);
@@ -150,8 +175,9 @@ set_config('auth_instructions',
 );
 $messages[] = 'Charte ISP appliquée : logo officiel, palette bordeaux et bleu, photo de salle de cours.';
 
-set_config('frontpage', '0,6');
-set_config('frontpageloggedin', '0,6');
+// Keep announcements available without displaying them on the custom front page.
+set_config('frontpage', '');
+set_config('frontpageloggedin', '');
 if ($DB->record_exists('modules', ['name' => 'attendance'])) {
     set_config('resultsperpage', 50, 'attendance');
     set_config('enablecalendar', 1, 'attendance');
@@ -519,6 +545,8 @@ $certificate = $DB->get_record('customcert', [
     'name' => 'Certificat de réussite ISP',
 ]);
 if ($certificate) {
+    require_once __DIR__ . '/certificate-template.php';
+    isp_apply_certificate_template($certificate);
     $certificatecm = get_coursemodule_from_instance('customcert', $certificate->id, $badgecourseid, false, MUST_EXIST);
     $availability = json_encode([
         'op' => '&',

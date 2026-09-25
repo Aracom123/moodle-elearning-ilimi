@@ -173,7 +173,10 @@
                                 </div>
                             </div>
                         {{/overflow}}
-                        {{{ output.main_content }}}
+                        {{{ ispdashboardhtml }}}
+                        <div {{#ispmycoursespage}}id="isp-my-courses-list" {{/ispmycoursespage}}class="isp-dashboard-native{{#ispdashboardreplacesblocks}} is-suppressed{{/ispdashboardreplacesblocks}}">
+                            {{{ output.main_content }}}
+                        </div>
                         {{{ output.activity_navigation }}}
                         {{{ output.course_content_footer }}}
 

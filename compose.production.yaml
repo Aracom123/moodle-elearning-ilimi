@@ -1,0 +1,30 @@
+services:
+  db:
+    network_mode: host
+    ports: !reset []
+    environment:
+      MYSQL_PASSWORD: ${MOODLE_DB_PASSWORD:?Set MOODLE_DB_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --port=3307
+      - --bind-address=127.0.0.1
+
+  web:
+    network_mode: host
+    ports: !reset []
+    environment:
+      MOODLE_WWWROOT: ${MOODLE_WWWROOT:?Set MOODLE_WWWROOT in .env}
+      MOODLE_SSLPROXY: "true"
+      MOODLE_DB_HOST: 127.0.0.1
+      MOODLE_DB_PORT: "3307"
+      MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD:?Set MOODLE_DB_PASSWORD in .env}
+      MOODLE_ADMIN_PASSWORD: ${MOODLE_ADMIN_PASSWORD:?Set MOODLE_ADMIN_PASSWORD in .env}
+
+  cron:
+    network_mode: host
+    environment:
+      MOODLE_DB_HOST: 127.0.0.1
+      MOODLE_DB_PORT: "3307"
+      MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD:?Set MOODLE_DB_PASSWORD in .env}

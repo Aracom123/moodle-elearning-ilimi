@@ -73,10 +73,113 @@
 /* ---------- Layout filtres + résultats ---------- */
 .beit-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: minmax(0, 1fr) 280px;
     gap: 2rem;
     align-items: start;
 }
+
+.beit-slideshow {
+    position: relative;
+    height: clamp(310px, 36vw, 490px);
+    overflow: hidden;
+    border-radius: 16px;
+    margin: 1.5rem 0 2.75rem;
+    background: #14365a;
+    color: #fff;
+}
+
+.beit-slide,
+.beit-slide > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.beit-slide[hidden] { display: none; }
+
+.beit-slide > img {
+    object-fit: cover;
+    object-position: center;
+}
+
+.beit-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(15, 35, 58, .91), rgba(15, 35, 58, .18));
+}
+
+.beit-slide-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    max-width: 650px;
+    padding: clamp(2rem, 5vw, 5rem);
+}
+
+.beit-slide-content h1 {
+    color: #fff;
+    font-size: clamp(2rem, 4.5vw, 3.8rem);
+    font-weight: 750;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+}
+
+.beit-slide-content p {
+    color: #f0f5fa;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.55;
+    max-width: 46ch;
+    margin-bottom: 1.4rem;
+}
+
+.beit-slide-content a {
+    display: inline-block;
+    color: #153653;
+    background: #fff;
+    padding: .7rem 1.15rem;
+    border-radius: 9px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.beit-slide-content a:hover,
+.beit-slide-content a:focus-visible { background: #e7f1ff; }
+
+.beit-slide-controls {
+    position: absolute;
+    z-index: 2;
+    right: 1.5rem;
+    bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    color: #fff;
+}
+
+.beit-slide-controls button {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(14, 36, 60, .78);
+    border: 1px solid rgba(255, 255, 255, .75);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.beit-slide-position { min-width: 3rem; text-align: center; font-variant-numeric: tabular-nums; }
+
+.beit-catalog-heading { margin: 0 0 1.5rem; }
+.beit-catalog-heading h2 { font-size: clamp(1.6rem, 2.5vw, 2.1rem); font-weight: 750; margin-bottom: .35rem; }
+.beit-catalog-heading p { color: #475569; margin: 0; }
 
 /* Colonne de filtres */
 .beit-filters {
@@ -515,6 +618,10 @@
 }
 
 @media (max-width: 600px) {
+    .beit-slideshow { height: 420px; margin-top: 1rem; }
+    .beit-slide::after { background: linear-gradient(0deg, rgba(15, 35, 58, .94), rgba(15, 35, 58, .28)); }
+    .beit-slide-content { justify-content: flex-end; padding: 1.5rem 1.5rem 5.5rem; }
+    .beit-slide-controls { right: 1.25rem; bottom: 1rem; }
     .beit-catalog-hero {
         padding: 2.5rem 1rem 2rem;
     }

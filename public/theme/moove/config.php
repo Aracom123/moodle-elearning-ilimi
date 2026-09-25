@@ -53,6 +53,12 @@ $THEME->layouts = [
         'defaultregion' => 'side-pre',
         'options' => ['langmenu' => true],
     ],
+    'mydashboard' => [
+        'file' => 'drawers.php',
+        'regions' => ['side-pre', 'content'],
+        'defaultregion' => 'side-pre',
+        'options' => ['nonavbar' => true, 'langmenu' => true],
+    ],
     'login' => [
         'file' => 'login.php',
         'regions' => [],

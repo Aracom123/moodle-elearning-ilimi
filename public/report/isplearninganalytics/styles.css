@@ -53,3 +53,29 @@
     }
 }
 
+.isp-admin-detail {
+    max-width: 1100px;
+    margin: 0 auto 2rem;
+}
+
+.isp-admin-detail-back {
+    display: inline-block;
+    margin-bottom: 1.25rem;
+    color: #1762a2;
+    font-weight: 650;
+}
+
+.isp-admin-detail-description {
+    color: #4e6174;
+    max-width: 70ch;
+}
+
+.isp-admin-detail-count {
+    color: #17324d;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.isp-admin-detail-table {
+    overflow-x: auto;
+}

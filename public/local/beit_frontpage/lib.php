@@ -33,22 +33,34 @@ function local_beit_frontpage_get_courses() {
         return [];
     }
 
-    // Noms de catégories en une seule requête.
-    $catids = array_unique(array_map(function($c) {
-        return $c->category;
-    }, $courses));
-    $categories = [];
-    if (!empty($catids)) {
-        list($insql, $params) = $DB->get_in_or_equal($catids);
-        $records = $DB->get_records_select('course_categories', "id $insql", $params, '', 'id, name, visible');
-        foreach ($records as $cat) {
-            $categories[$cat->id] = $cat;
-        }
-    }
+    // Keep category ancestry: the level may be an ancestor of the course category.
+    $categories = $DB->get_records('course_categories', null, '', 'id, name, path, visible');
 
     foreach ($courses as $course) {
         $cat = isset($categories[$course->category]) ? $categories[$course->category] : null;
         $course->categoryname = $cat ? format_string($cat->name) : '';
+        $course->level = '';
+        if ($cat) {
+            foreach (array_reverse(array_filter(explode('/', $cat->path))) as $ancestorid) {
+                if (!isset($categories[$ancestorid])) {
+                    continue;
+                }
+                $ancestorname = core_text::strtolower($categories[$ancestorid]->name);
+                if (preg_match('/\b(master|licence)\b/u', $ancestorname, $matches)) {
+                    $course->level = ucfirst($matches[1]);
+                    break;
+                }
+            }
+        }
+        // Also recognise the level in the course metadata when the category
+        // tree has not yet been normalised by the school team.
+        if ($course->level === '' && preg_match(
+            '/\b(master|licence)\b/u',
+            core_text::strtolower($course->fullname . ' ' . $course->shortname),
+            $matches
+        )) {
+            $course->level = ucfirst($matches[1]);
+        }
         // Le cours est-il ouvert à l'auto-inscription / inscription possible ?
         $course->canenrol = local_beit_frontpage_course_can_enrol($course->id);
     }
@@ -144,6 +156,7 @@ function local_beit_frontpage_render_card($course, $isloggedin) {
     );
 
     $data = ' data-category="' . s($catname) . '"'
+          . ' data-level="' . s($course->level ?? '') . '"'
           . ' data-timecreated="' . $timecreated . '"'
           . ' data-canenrol="' . $canenrol . '"'
           . ' data-name="' . s(core_text::strtolower($course->fullname)) . '"'
@@ -235,6 +248,28 @@ function local_beit_frontpage_collect_categories($courses) {
     return $cats;
 }
 
+/** Distinct academic levels found in the category tree. */
+function local_beit_frontpage_collect_levels($courses) {
+    global $DB;
+
+    $levels = [];
+    foreach ($courses as $course) {
+        if (!empty($course->level)) {
+            $levels[$course->level] = true;
+        }
+    }
+    // Keep the controls visible when the academic categories already exist
+    // but their courses have not yet been reclassified by the school team.
+    foreach ($DB->get_records('course_categories', null, '', 'id, name') as $category) {
+        if (preg_match('/\b(master|licence)\b/u', core_text::strtolower($category->name), $matches)) {
+            $levels[ucfirst($matches[1])] = true;
+        }
+    }
+    $levels = array_keys($levels);
+    sort($levels, SORT_NATURAL | SORT_FLAG_CASE);
+    return $levels;
+}
+
 /**
  * Rend la colonne de filtres.
  *
@@ -243,6 +278,7 @@ function local_beit_frontpage_collect_categories($courses) {
  */
 function local_beit_frontpage_render_filters($courses) {
     $categories = local_beit_frontpage_collect_categories($courses);
+    $levels = local_beit_frontpage_collect_levels($courses);
 
     $out  = '<aside class="beit-filters" id="beit-filters">';
     $out .= '<div class="beit-filters-header">';
@@ -268,6 +304,7 @@ function local_beit_frontpage_render_filters($courses) {
     $out .= '<option value="az">' . get_string('sortaz', 'local_beit_frontpage') . '</option>';
     $out .= '<option value="za">' . get_string('sortza', 'local_beit_frontpage') . '</option>';
     $out .= '<option value="recent">' . get_string('sortrecent', 'local_beit_frontpage') . '</option>';
+    $out .= '<option value="oldest">' . get_string('sortoldest', 'local_beit_frontpage') . '</option>';
     $out .= '</select>';
     $out .= '</div>';
 
@@ -293,6 +330,16 @@ function local_beit_frontpage_render_filters($courses) {
         $out .= '</div>';
     }
 
+    if ($levels) {
+        $out .= '<div class="beit-filter-group"><span class="beit-filter-label">'
+              . get_string('levellabel', 'local_beit_frontpage') . '</span>';
+        foreach ($levels as $level) {
+            $out .= '<label class="beit-filter-check"><input type="checkbox" class="beit-level-check" value="'
+                  . s($level) . '"> ' . s($level) . '</label>';
+        }
+        $out .= '</div>';
+    }
+
     $out .= '</aside>';
     return $out;
 }
@@ -308,16 +355,31 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
     $out = local_beit_frontpage_inline_css();
     $out .= '<div class="beit-catalog beit-catalog--full">';
 
-    // Hero.
-    $out .= '<div class="beit-catalog-hero">';
-    $out .= '<h1 class="beit-catalog-title">' . get_string('catalogtitle', 'local_beit_frontpage') . '</h1>';
-    $out .= '<p class="beit-catalog-subtitle">' . get_string('catalogsubtitle', 'local_beit_frontpage') . '</p>';
-    if (!$isloggedin) {
-        $loginurl = new moodle_url('/login/index.php');
-        $out .= '<a href="' . $loginurl->out() . '" class="beit-catalog-cta">'
-              . get_string('logintoenrol', 'local_beit_frontpage') . '</a>';
+    // Institution-owned imagery and copy; the first slide stays readable without JavaScript.
+    $out .= '<section class="beit-slideshow" aria-label="' . s(get_string('slideshowlabel', 'local_beit_frontpage')) . '">';
+    $slides = [
+        ['image' => '/local/beit_frontpage/course_images/slider/formation.jpg', 'title' => 'slidetitle1', 'copy' => 'slidecopy1'],
+        ['image' => '/local/beit_frontpage/course_images/slider/communaute.jpg', 'title' => 'slidetitle2', 'copy' => 'slidecopy2'],
+        ['image' => '/local/beit_frontpage/course_images/slider/etude.jpg', 'title' => 'slidetitle3', 'copy' => 'slidecopy3'],
+    ];
+    foreach ($slides as $index => $slide) {
+        $image = new moodle_url($slide['image']);
+        $out .= '<article class="beit-slide' . ($index === 0 ? ' is-active' : '') . '"'
+              . ($index === 0 ? '' : ' hidden') . '>';
+        $out .= '<img src="' . $image->out(false) . '" alt=""' . ($index === 0 ? '' : ' loading="lazy"') . '>';
+        $out .= '<div class="beit-slide-content"><h1>' . get_string($slide['title'], 'local_beit_frontpage') . '</h1>';
+        $out .= '<p>' . get_string($slide['copy'], 'local_beit_frontpage') . '</p>';
+        $out .= '<a href="#beit-course-catalog">' . get_string('explorecourses', 'local_beit_frontpage') . '</a></div>';
+        $out .= '</article>';
     }
-    $out .= '</div>';
+    $out .= '<div class="beit-slide-controls">';
+    $out .= '<button type="button" data-slide="previous" aria-label="' . s(get_string('previousslide', 'local_beit_frontpage')) . '">‹</button>';
+    $out .= '<span class="beit-slide-position" aria-live="polite">1 / 3</span>';
+    $out .= '<button type="button" data-slide="next" aria-label="' . s(get_string('nextslide', 'local_beit_frontpage')) . '">›</button>';
+    $out .= '</div></section>';
+    $out .= '<div id="beit-course-catalog" class="beit-catalog-heading"><h2>'
+          . get_string('catalogtitle', 'local_beit_frontpage') . '</h2><p>'
+          . get_string('catalogsubtitle', 'local_beit_frontpage') . '</p></div>';
 
     if (empty($courses)) {
         $out .= '<div class="beit-catalog-empty"><p>'
@@ -328,9 +390,6 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
 
     // Layout deux colonnes : filtres + cours.
     $out .= '<div class="beit-layout">';
-
-    // Colonne filtres.
-    $out .= local_beit_frontpage_render_filters($courses);
 
     // Colonne cours.
     $out .= '<div class="beit-results">';
@@ -357,6 +416,8 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
           . get_string('nomatch', 'local_beit_frontpage') . '</p></div>';
 
     $out .= '</div>'; // .beit-results
+    // Filters follow results in the DOM and appear on the right on wide screens.
+    $out .= local_beit_frontpage_render_filters($courses);
     $out .= '</div>'; // .beit-layout
     $out .= '</div>'; // .beit-catalog
 

@@ -34,3 +34,5 @@ $string['footersupportcopy'] = 'Besoin d’aide avec la plateforme ? Consultez l
 $string['footerallrightsreserved'] = 'Tous droits réservés.';
 $string['footerbuiltby'] = 'Cette plateforme e-learning de l’Institut de Santé Publique — Niger a été conçue et développée par';
 $string['footercontentcopyright'] = 'Contenus pédagogiques et identité institutionnelle © Institut de Santé Publique — Niger.';
+$string['footerdevelopedby'] = 'Développé par';
+$string['footerpoweredby'] = 'Propulsé par';
