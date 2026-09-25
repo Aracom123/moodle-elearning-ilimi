@@ -9,9 +9,11 @@ $admin = get_admin();
 \core\session\manager::set_user($admin);
 $USER->editing = 1;
 
-$_GET = [];
+// Render the actual site front page even when an administrator's configured
+// default home page is the dashboard or My courses.
+$_GET = ['redirect' => 0];
 $_POST = [];
-$_REQUEST = [];
+$_REQUEST = $_GET;
 
 chdir($CFG->dirroot);
 ob_start();
