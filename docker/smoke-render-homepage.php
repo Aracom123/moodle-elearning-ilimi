@@ -2,6 +2,7 @@
 // Smoke-test the front page with an administrator in editing mode.
 
 define('CLI_SCRIPT', true);
+define('BEHAT_SITE_RUNNING', true);
 
 require_once('/var/www/moodle/config.php');
 
