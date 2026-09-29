@@ -358,9 +358,9 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
     // Institution-owned imagery and copy; the first slide stays readable without JavaScript.
     $out .= '<section class="beit-slideshow" aria-label="' . s(get_string('slideshowlabel', 'local_beit_frontpage')) . '">';
     $slides = [
-        ['image' => '/local/beit_frontpage/course_images/slider/formation.jpg', 'title' => 'slidetitle1', 'copy' => 'slidecopy1'],
-        ['image' => '/local/beit_frontpage/course_images/slider/communaute.jpg', 'title' => 'slidetitle2', 'copy' => 'slidecopy2'],
-        ['image' => '/local/beit_frontpage/course_images/slider/etude.jpg', 'title' => 'slidetitle3', 'copy' => 'slidecopy3'],
+        ['image' => '/local/beit_frontpage/course_images/slider/formation.jpg', 'title' => 'slidetitle1', 'copy' => 'slidecopy1', 'url' => '#beit-course-catalog', 'button' => 'explorecourses'],
+        ['image' => '/local/beit_frontpage/course_images/slider/communaute.jpg', 'title' => 'slidetitle2', 'copy' => 'slidecopy2', 'url' => '/my/', 'button' => 'viewprogress'],
+        ['image' => '/local/beit_frontpage/course_images/slider/etude.jpg', 'title' => 'slidetitle3', 'copy' => 'slidecopy3', 'url' => '/mod/customcert/my_certificates.php', 'button' => 'viewcertificates'],
     ];
     foreach ($slides as $index => $slide) {
         $image = new moodle_url($slide['image']);
@@ -369,7 +369,8 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
         $out .= '<img src="' . $image->out(false) . '" alt=""' . ($index === 0 ? '' : ' loading="lazy"') . '>';
         $out .= '<div class="beit-slide-content"><h1>' . get_string($slide['title'], 'local_beit_frontpage') . '</h1>';
         $out .= '<p>' . get_string($slide['copy'], 'local_beit_frontpage') . '</p>';
-        $out .= '<a href="#beit-course-catalog">' . get_string('explorecourses', 'local_beit_frontpage') . '</a></div>';
+        $target = $slide['url'][0] === '#' ? $slide['url'] : (new moodle_url($slide['url']))->out(false);
+        $out .= '<a href="' . s($target) . '">' . get_string($slide['button'], 'local_beit_frontpage') . '</a></div>';
         $out .= '</article>';
     }
     $out .= '<div class="beit-slide-controls">';
@@ -390,6 +391,9 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
 
     // Layout deux colonnes : filtres + cours.
     $out .= '<div class="beit-layout">';
+
+    // Keep navigation filters first in both reading order and desktop layout.
+    $out .= local_beit_frontpage_render_filters($courses);
 
     // Colonne cours.
     $out .= '<div class="beit-results">';
@@ -416,8 +420,6 @@ function local_beit_frontpage_render_catalog($courses, $isloggedin) {
           . get_string('nomatch', 'local_beit_frontpage') . '</p></div>';
 
     $out .= '</div>'; // .beit-results
-    // Filters follow results in the DOM and appear on the right on wide screens.
-    $out .= local_beit_frontpage_render_filters($courses);
     $out .= '</div>'; // .beit-layout
     $out .= '</div>'; // .beit-catalog
 

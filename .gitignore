@@ -3,6 +3,7 @@
 /.env
 /output/
 /tmp/
+/.artifacts/
 
 # --- Archive d'installation Moodle (trop volumineuse pour GitHub) ---
 /moodle-latest-502.zip

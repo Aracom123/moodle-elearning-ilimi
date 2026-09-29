@@ -73,7 +73,7 @@
 /* ---------- Layout filtres + résultats ---------- */
 .beit-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: 280px minmax(0, 1fr);
     gap: 2rem;
     align-items: start;
 }
